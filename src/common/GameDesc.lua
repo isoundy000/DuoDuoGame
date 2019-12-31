@@ -1052,6 +1052,9 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         else
             desc = desc.."/抢庄"
         end
+        if data.bDeathCard == 1 then
+            desc = desc.."/亡牌"
+        end
         
     elseif wKindID == 48 then        
         if data.bPlayerCount == 3 then
@@ -1077,6 +1080,9 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
             desc = desc.."/轮庄"
         else
             desc = desc.."/抢庄"
+        end
+        if data.bDeathCard == 1 then
+            desc = desc.."/亡牌"
         end
         if data.bMaxLost == 300 then
             desc = desc.."/300封顶"
@@ -1115,6 +1121,13 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         if Bit:_and(data.dwMingTang,0x8000) ~= 0 then
             desc = desc.."/假行行息*4"
         end
+
+        if Bit:_and(data.dwMingTang,0x100000) ~= 0 then
+            desc = desc.."/背靠背*8"
+        end
+        if Bit:_and(data.dwMingTang,0x200000) ~= 0 then
+            desc = desc.."/满园花*20"
+        end
         if data.bSiQiHong == 1 then
             desc = desc.."/四七红"
         end
@@ -1125,9 +1138,15 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
             desc = desc.."/明跑提示"
         end
 
-        if data.bDeathCard == 1 then
-            desc = desc.."/去牌"
-        end
+        if data.bMaxLost == 100 then
+            desc = desc.."/100封顶"
+         elseif data.bMaxLost == 200  then
+            desc = desc.."/200封顶"
+         elseif data.bMaxLost == 300  then
+            desc = desc.."/300封顶"
+         elseif data.bMaxLost == 0  then
+            desc = desc.."/不封顶"
+         end
         
     elseif wKindID == 49 then        
         if data.bPlayerCount == 3 then
@@ -1170,6 +1189,10 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         end
         if data.bHuangFanAddUp == 1 then
             desc = desc.."/黄番"
+        end
+
+        if data.bDeathCard == 1 then
+            desc = desc.."/亡牌"
         end
 
         

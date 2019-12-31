@@ -86,6 +86,7 @@ function NewClubInfoLayer:onConfig()
         {"Button_isShow", "onIsSHow"},
         {"Panel_topRight"},
         {"Image_bottom"},
+        {"Image_moneyIcon"},
     }
     self.clubData           = {}      --亲友圈大厅数据
     self.userOffice         = 2       --普通成员
@@ -224,6 +225,17 @@ function NewClubInfoLayer:onCreate(param)
         self.Button_isShow:loadTextures(path, path, path)
         self.Panel_topRight:setVisible(false)
         self.Image_bottom:setVisible(false)
+    end
+
+    if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+        local path = 'kwxclub/kwxclub_24.png'
+        self.Button_fatigue:loadTextures(path, path, path)
+        self.Button_give:setVisible(false)
+        self.Image_moneyIcon:loadTexture('common/yuanbaoc_icon.png')
+    else
+        local path = 'kwxclub/club_info_6.png'
+        self.Button_fatigue:loadTextures(path, path, path)
+        self.Image_moneyIcon:loadTexture('kwxclub/club_hall_3.png')
     end
 end
 
@@ -471,7 +483,11 @@ function NewClubInfoLayer:onNotice()
 end
 
 function NewClubInfoLayer:onFatigue()
-    self:addChild(require("app.MyApp"):create(self.clubData, self.userFatigueValue, self.userOffice):createView("NewClubFatigueLayer"))
+    if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+        self:addChild(require("app.MyApp"):create(self.clubData):createView("NewClubDefendLayer"))
+    else
+        self:addChild(require("app.MyApp"):create(self.clubData, self.userFatigueValue, self.userOffice):createView("NewClubFatigueLayer"))
+    end
 end
 
 function NewClubInfoLayer:onIsSHow()
@@ -700,6 +716,17 @@ function NewClubInfoLayer:updateClubInfo()
     else
         self.Button_give:setVisible(true)
     end
+
+    --防沉迷
+    if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+        if Bit:_and(0x20, self.clubData.bIsDisable) == 0x20 then
+            self.Button_fatigue:setVisible(true)
+        else
+            self.Button_fatigue:setVisible(false)
+        end
+        self.Button_give:setVisible(false)
+    end
+
 end
 
 --移除亲友圈桌子
@@ -803,6 +830,7 @@ function NewClubInfoLayer:sortNewTable(dwTableID, itype)
         local x = 141 + (col - 1) * 330
         local y = 345 - (row - 1) * 240
         v:setPosition(x, y)
+        v.data = v.data or {}
         v.data.pos = (col - 1) * 2 + row
     end
 end
@@ -1406,7 +1434,12 @@ end
 function NewClubInfoLayer:RET_UPDATE_CLUB_PLAYER_INFO(event)
     local data = event._usedata
     Log.d(data)
-    self.Text_pilaozhi:setString(data.lFatigueValue)
+    if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+        self.Text_pilaozhi:setString(UserData.Bag:getBagPropCount(1009))
+    else
+        self.Text_pilaozhi:setString(data.lFatigueValue)
+    end
+    
     self.userOffice = data.cbOffice
     self.userFatigueValue = data.lFatigueValue
 
@@ -1429,7 +1462,9 @@ function NewClubInfoLayer:RET_SETTINGS_CLUB_MEMBER(event)
     if (data.cbSettingsType == 6 or data.cbSettingsType == 8) and (data.dwUserID == UserData.User.userID) then
         --疲劳值
         self.userFatigueValue = data.lFatigueValue
-        self.Text_pilaozhi:setString(data.lFatigueValue)
+        if not (CHANNEL_ID == 26 or CHANNEL_ID == 27) then
+            self.Text_pilaozhi:setString(data.lFatigueValue)
+        end
     elseif data.cbSettingsType == 7 or data.cbSettingsType == 11 then
         UserData.Guild:getUpdateClubInfo(self.clubData.dwClubID, UserData.User.userID)
         if data.cbSettingsType == 11 then

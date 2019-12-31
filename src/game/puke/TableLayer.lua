@@ -231,11 +231,13 @@ function TableLayer:doAction(action,pBuffer)
             self.lastOutCardInfo.tableCard = self:getExtractCardType(GameCommon.player[wChairID].cbCardData,GameCommon.player[wChairID].bUserCardCount,self.lastOutCardInfo.bCardData,self.lastOutCardInfo.bUserCardCount)
         end
         if pBuffer.wCurrentUser == wChairID and self.lastOutCardInfo.wOutCardUser ~= wChairID and #self.lastOutCardInfo.tableCard <= 0 then  
-            self:showCountDown(pBuffer.wCurrentUser,true)
+            --self:showCountDown(pBuffer.wCurrentUser,true)
+            self:runAction(cc.Sequence:create(cc.DelayTime:create(0.6),cc.CallFunc:create(function(sender,event)  self:showCountDown(pBuffer.wCurrentUser,true) end)))
         else
-            self:tryAutoSendCard(pBuffer.wCurrentUser)
+            --self:tryAutoSendCard(pBuffer.wCurrentUser)
+            self:runAction(cc.Sequence:create(cc.DelayTime:create(0.6),cc.CallFunc:create(function(sender,event)  self:tryAutoSendCard(pBuffer.wCurrentUser) end)))
         end
-        self:runAction(cc.Sequence:create(cc.DelayTime:create(1),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
+        self:runAction(cc.Sequence:create(cc.DelayTime:create(0.5),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
                              
     elseif action == NetMsgId.SUB_S_WARN_INFO_PDK then
         GameCommon:playAnimation(self.root, "报警",pBuffer.wWarnUser)
@@ -334,7 +336,7 @@ function TableLayer:doAction(action,pBuffer)
         else
             self:tryAutoSendCard(pBuffer.wCurrentUser)
         end
-        self:runAction(cc.Sequence:create(cc.DelayTime:create(1),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
+        self:runAction(cc.Sequence:create(cc.DelayTime:create(0.1),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
         
     elseif action == NetMsgId.SUB_S_GAME_END_PDK then
         local wChairID = pBuffer.wWinUser
@@ -526,6 +528,7 @@ function TableLayer:initUI()
     local uiImage_watermark = ccui.Helper:seekWidgetByName(self.root,"Image_watermark")
     uiImage_watermark:loadTexture(StaticData.Games[wKindID].icon)
     uiImage_watermark:ignoreContentAdaptWithSize(true)
+    uiImage_watermark:setVisible(false)
     local uiText_desc = ccui.Helper:seekWidgetByName(self.root,"Text_desc")
     uiText_desc:setString("")
     local uiText_time = ccui.Helper:seekWidgetByName(self.root,"Text_time")

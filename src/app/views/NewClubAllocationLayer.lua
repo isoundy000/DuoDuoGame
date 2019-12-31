@@ -83,7 +83,7 @@ function NewClubAllocationLayer:onFind()
 	end
 	local dwUserID = self.TextField_playID:getString()
 	if dwUserID ~= "" then
-		UserData.Guild:findClubNotPartnerMember(self.data.dwClubID, tonumber(dwUserID))
+		UserData.Guild:findClubNotPartnerMember(self.data.dwClubID, UserData.User.userID, 1, tonumber(dwUserID))
 	end
 end
 

@@ -80,7 +80,7 @@ function NewClubSellFatigueLayer:RET_SETTINGS_CLUB_MEMBER(event)
         elseif data.lRet == 7 then
     		require("common.MsgBoxLayer"):create(0,nil,"您疲劳值不足!")
         elseif data.lRet == 100 then
-            require("common.MsgBoxLayer"):create(0,nil,"对局中不能修改疲劳值")
+            require("common.MsgBoxLayer"):create(0,nil,"对局中不能减少疲劳值")
         else
             require("common.MsgBoxLayer"):create(0,nil,"操作失败!")
         end

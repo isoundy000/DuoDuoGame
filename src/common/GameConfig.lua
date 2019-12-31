@@ -193,7 +193,8 @@ function GameConfig:getParameter(wKindID,luaFunc)
         data.bFalseSpring = luaFunc:readRecvByte()         --假春天           0无       1有      
         data.bHostedTime = luaFunc:readRecvByte()                 --托管时间
         data.bHostedSession = luaFunc:readRecvByte()                 --托管局数
-        haveReadByte = 12    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
+        data.b4Add2 = luaFunc:readRecvByte()                --是否可4带2        0无      1有
+        haveReadByte = 13    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
         
     elseif wKindID == 36 then
         data.FanXing = {}

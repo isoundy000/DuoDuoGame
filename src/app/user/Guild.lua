@@ -727,6 +727,10 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         for i=1,10 do
             data.lFatigueLimit[i] = luaFunc:readRecvLong() 
         end
+        data.wAntiCell = {}
+        for i=1,10 do
+            data.wAntiCell[i] = luaFunc:readRecvWORD() / 100
+        end
 
         data.szParameterName = {}
         for i = 1,10 do
@@ -819,6 +823,10 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         for i=1,10 do
             data.lFatigueLimit[i] = luaFunc:readRecvLong() 
         end
+        data.wAntiCell = {}
+        for i=1,10 do
+            data.wAntiCell[i] = luaFunc:readRecvWORD() / 100
+        end
 
         data.szParameterName = {}
         for i = 1,10 do
@@ -880,6 +888,8 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         data.cbOnlineStatus = luaFunc:readRecvByte()
         data.cbOffice = luaFunc:readRecvByte()
         data.isProhibit = luaFunc:readRecvBool()
+        data.dwDistributionRatio = luaFunc:readRecvDWORD()
+        data.dwPartnerLevel = luaFunc:readRecvDWORD()
 
         EventMgr:dispatch(EventType.RET_GET_CLUB_PARTNER, data)
 
@@ -944,12 +954,12 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
     elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_FIND_CLUB_NOT_PARTNER_MEMBER then
         --返回查找亲友圈非合伙人成员
         local data = {}
-        data.lRet = luaFunc:readRecvLong()
         data.dwClubID = luaFunc:readRecvDWORD()
         data.dwUserID = luaFunc:readRecvDWORD()
         data.szNickName = luaFunc:readRecvString(32)
         data.szLogoInfo = luaFunc:readRecvString(256)
         data.dwLastLoginTime = luaFunc:readRecvDWORD()
+        data.isEnd = luaFunc:readRecvBool()
         data.cbOnlineStatus = luaFunc:readRecvByte()
         data.dwJoinTime = luaFunc:readRecvDWORD()
         data.cbOffice = luaFunc:readRecvByte()
@@ -957,8 +967,13 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         data.isProhibit = luaFunc:readRecvBool()
         data.szRemarks = luaFunc:readRecvString(32)
         data.lFatigueValue = luaFunc:readRecvLong() / 100
-        -- data.dwACard = luaFunc:readRecvDWORD()
+        data.szPartnerNickName = luaFunc:readRecvString(32)
         EventMgr:dispatch(EventType.RET_FIND_CLUB_NOT_PARTNER_MEMBER, data)
+
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_FIND_CLUB_NOT_PARTNER_MEMBER_FINISH then
+        local data = {}
+        data.isFinish = luaFunc:readRecvBool()
+        EventMgr:dispatch(EventType.RET_FIND_CLUB_NOT_PARTNER_MEMBER_FINISH, data)
 
     elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_FIND_CLUB_PARTNER_MEMBER then
         --返回查找亲友圈合伙人成员
@@ -979,6 +994,8 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         data.cbOnlineStatus = luaFunc:readRecvByte()
         data.cbOffice = luaFunc:readRecvByte()
         data.isProhibit = luaFunc:readRecvBool()
+        data.dwDistributionRatio = luaFunc:readRecvDWORD()
+        data.dwPartnerLevel = luaFunc:readRecvDWORD()
         EventMgr:dispatch(EventType.RET_FIND_CLUB_PARTNER_MEMBER, data)
 
     elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_GET_CLUB_MEMBER_FATIGUE_RECORD then
@@ -1163,6 +1180,7 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         data.dwTargetYuanBaoIncome = luaFunc:readRecvLong() / 100
         data.dwTargetFatigueTip = luaFunc:readRecvLong() / 100
         data.dwBigWinnerTime = luaFunc:readRecvDWORD()
+        data.lTotalScoreTotal = luaFunc:readRecvLong()
         EventMgr:dispatch(EventType.RET_CLUB_PARTNER_COUNT, data)
 
     elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_PAGE_PARTNER_COUNT then
@@ -1177,6 +1195,7 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         data.dwTargetYuanBaoIncome = luaFunc:readRecvLong() / 100
         data.dwTargetFatigueTip = luaFunc:readRecvLong() / 100
         data.dwBigWinnerTime = luaFunc:readRecvDWORD()
+        data.lTotalScoreTotal = luaFunc:readRecvLong()
         EventMgr:dispatch(EventType.RET_CLUB_PAGE_PARTNER_COUNT, data)
 
     elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_PAGE_PARTNER_COUNT_FINISH then
@@ -1257,6 +1276,97 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         data.isFinish = luaFunc:readRecvBool()
         EventMgr:dispatch(EventType.RET_CLUB_MEMBER_INFO_FINISH, data)
 
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_ANTI_LIMIT then
+        local data = {}
+        data.lRet = luaFunc:readRecvLong()
+        data.iAntiLimit = luaFunc:readRecvInt() / 100
+        data.dwPartnerLevel = luaFunc:readRecvDWORD()
+        EventMgr:dispatch(EventType.RET_CLUB_ANTI_LIMIT, data)
+
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_SETTING_ANTI_LIMIT then
+        local data = {}
+        data.lRet = luaFunc:readRecvLong()
+        data.iAntiLimit = luaFunc:readRecvInt() / 100
+        EventMgr:dispatch(EventType.RET_CLUB_SETTING_ANTI_LIMIT, data)
+
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_ANTI_LIST then
+        local data = {}
+        data.lRet = luaFunc:readRecvLong()
+        data.dwUserID = luaFunc:readRecvDWORD()
+        data.szNickName = luaFunc:readRecvString(32)
+        data.szLogoInfo = luaFunc:readRecvString(256)
+        data.dwUserRole = luaFunc:readRecvDWORD()
+        data.dwPartnerLevel = luaFunc:readRecvDWORD()
+        data.iAntiValue = luaFunc:readRecvInt() / 100
+        data.iAntiLimit = luaFunc:readRecvInt() / 100
+        data.dwPartnerID = luaFunc:readRecvDWORD()
+        data.szPartnerNickName = luaFunc:readRecvString(32)
+        data.bOnline = luaFunc:readRecvByte()
+        data.dwLastLoginDate = luaFunc:readRecvDWORD()
+        data.iRefreshAntiValue = luaFunc:readRecvInt() / 100
+        if data.iRefreshAntiValue ~= 0 then
+            data.iRefreshAntiValue = data.iRefreshAntiValue * -1
+        end
+        data.iAllUserRefreshAntiValue = luaFunc:readRecvInt() / 100
+        if data.iAllUserRefreshAntiValue ~= 0 then
+            data.iAllUserRefreshAntiValue = data.iAllUserRefreshAntiValue * -1
+        end
+
+        data.iTotalAntiValue = luaFunc:readRecvInt() / 100
+        EventMgr:dispatch(EventType.RET_CLUB_ANTI_LIST, data)
+
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_ANTI_LIST_FINISH then
+        local data = {}
+        data.isFinish = luaFunc:readRecvBool()
+        EventMgr:dispatch(EventType.RET_CLUB_ANTI_LIST_FINISH, data)
+
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_SETTING_ANTI_MEMBER then
+        local data = {}
+        data.lRet = luaFunc:readRecvLong()
+        data.bOperatorType = luaFunc:readRecvByte()
+        data.iAntiLimit = luaFunc:readRecvInt() / 100
+        data.dwUserID = luaFunc:readRecvDWORD()
+        EventMgr:dispatch(EventType.RET_CLUB_SETTING_ANTI_MEMBER, data)
+
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_ANTI_REFRESH_LOG then
+        local data = {}
+        data.dwUserID = luaFunc:readRecvDWORD()
+        data.bOpType = luaFunc:readRecvByte()
+        data.dwOpUserID = luaFunc:readRecvDWORD()
+        data.dwClubID = luaFunc:readRecvDWORD()
+        data.wKindID = luaFunc:readRecvWORD()
+        data.iOldAntiValue = luaFunc:readRecvInt() / 100
+        data.iAntiValue = luaFunc:readRecvInt() / 100
+        data.iNewAntiValue = luaFunc:readRecvInt() / 100
+        data.szRemark = luaFunc:readRecvString(32)
+        data.dwCreateTime = luaFunc:readRecvDWORD()
+        data.szNickName = luaFunc:readRecvString(32)
+        data.szLogoInfo = luaFunc:readRecvString(256)
+        data.szOpUserNickName = luaFunc:readRecvString(32)
+        data.szOpUserLogoInfo = luaFunc:readRecvString(256)
+        EventMgr:dispatch(EventType.RET_CLUB_ANTI_REFRESH_LOG, data)
+
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_CLUB_ANTI_REFRESH_LOG_FINISH then
+        local data = {}
+        data.isFinish = luaFunc:readRecvBool()
+        EventMgr:dispatch(EventType.RET_CLUB_ANTI_REFRESH_LOG_FINISH, data)
+
+    elseif mainCmdID == NetMsgId.MDM_CL_CLUB and subCmdID == NetMsgId.RET_MATCH_CLUB_TABLE then
+        local data = {}
+        data.lRet = luaFunc:readRecvLong()
+        data.dwTableID = luaFunc:readRecvDWORD()
+        data.dwClubID = luaFunc:readRecvDWORD()
+        data.dwPlayID = luaFunc:readRecvDWORD()
+        data.wKindID = luaFunc:readRecvWORD()
+        data.wGameCount = luaFunc:readRecvWORD()
+        data.wTableCell = luaFunc:readRecvWORD()
+        local haveReadByte = 0
+        data.tableParameter, haveReadByte = require("common.GameConfig"):getParameter(data.wKindID,luaFunc)
+        if haveReadByte < 128 then
+            luaFunc:readRecvBuffer(128-haveReadByte)
+        end
+        EventMgr:dispatch(EventType.RET_MATCH_CLUB_TABLE, data)
+
     else
         return
     end
@@ -1294,12 +1404,12 @@ end
 --创建亲友圈
 function Guild:createClub(szClubName)
     local UserData = require("app.user.UserData")
-    if (CHANNEL_ID == 10 or CHANNEL_ID == 11) and UserData.Bag:getBagPropCount(1003) < 200 then
-        local data = {}
-        data.lRet = 1002
-        EventMgr:dispatch(EventType.RET_CREATE_CLUB,data)
-        return
-    end
+    -- if (CHANNEL_ID == 10 or CHANNEL_ID == 11) and UserData.Bag:getBagPropCount(1003) < 200 then
+    --     local data = {}
+    --     data.lRet = 1002
+    --     EventMgr:dispatch(EventType.RET_CREATE_CLUB,data)
+    --     return
+    -- end
     NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_CREATE_CLUB3,"dns",UserData.User.userID,32,szClubName)
 end
 
@@ -1435,9 +1545,10 @@ end
 
 ---------------------------------------------
 --请求修改亲友圈成员
-function Guild:reqSettingsClubMember(cbSettingsType,dwClubID,dwUserID,dwPartner,szRemarks,lFatigue)
+function Guild:reqSettingsClubMember(cbSettingsType,dwClubID,dwUserID,dwPartner,szRemarks,lFatigue, dwDistributionRatio)
     lFatigue = lFatigue or 0
-    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_MEMBER, "bdddnsl", cbSettingsType, dwClubID, dwUserID,dwPartner, 32, szRemarks,lFatigue)
+    dwDistributionRatio = dwDistributionRatio or 0
+    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_MEMBER, "bdddnsldd", cbSettingsType, dwClubID, dwUserID,dwPartner, 32, szRemarks,lFatigue,0,dwDistributionRatio)
 end
 
 --请求亲友圈合伙人
@@ -1459,8 +1570,9 @@ function Guild:getClubNotPartnerMember(bReqType, wPageIndex, dwClubID, dwPartner
 end
 
 --请求查找亲友圈非合伙人成员
-function Guild:findClubNotPartnerMember(dwClubID, dwUserID)
-    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_FIND_CLUB_NOT_PARTNER_MEMBER, "dd", dwClubID, dwUserID)
+function Guild:findClubNotPartnerMember(dwClubID, dwOperatorID, bOperatorType, dTargetUserID, wPageIndex)
+    wPageIndex = wPageIndex or 1
+    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_FIND_CLUB_NOT_PARTNER_MEMBER, "ddbdw", dwClubID, dwOperatorID, bOperatorType, dTargetUserID, wPageIndex)
 end
 
 --查找亲友圈合伙人成员
@@ -1470,6 +1582,9 @@ end
 
 --请求俱乐部成员疲劳值记录
 function Guild:getClubFatigueRecord(dwClubID, dwUserID, wPage, bType, dwBeganTime, dwEndTime)
+    if not dwUserID then
+        return
+    end
     bType = bType or 0
     dwBeganTime = dwBeganTime or 0
     dwEndTime = dwEndTime or 0
@@ -1549,6 +1664,42 @@ end
 --请求亲友圈成员
 function Guild:reqClubMemberInfo(dwClubID, dwOperatorID, bOperatorType, dTargetUserID, wPageIndex)
     NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_CLUB_MEMBER_INFO, "ddbdw", dwClubID, dwOperatorID, bOperatorType, dTargetUserID, wPageIndex)
+end
+
+--请求防沉迷设置下限值
+function Guild:getClubAntiLimit(dwClubID, dwOperatorID)
+    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_CLUB_ANTI_LIMIT, "dd", dwClubID, dwOperatorID)
+end
+
+--请求设置亲有圈沉迷下限
+function Guild:setClubAntiLimit(dwClubID, dwOperatorID, bOperatorType, iAntiLimit)
+    if iAntiLimit then
+        iAntiLimit = iAntiLimit * 100
+    end
+    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_CLUB_SETTING_ANTI_LIMIT, "ddbi", dwClubID, dwOperatorID, bOperatorType, iAntiLimit)
+end
+
+--请求防沉迷成员列表
+function Guild:getClubAntiMemberInfo(dwClubID, dwOperatorID, bOperatorType, dwTargetID, dwStartTime, dwEndTime, dwPageIndex)
+    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_CLUB_ANTI_LIST, "ddbdddd", dwClubID, dwOperatorID, bOperatorType, dwTargetID, dwStartTime, dwEndTime, dwPageIndex)
+end
+
+--设置成员沉迷信息
+function Guild:setClubAntiMember(dwClubID, dwOperatorID, bOperatorType, dwTargetID, iAntiLimit)
+    if iAntiLimit then
+        iAntiLimit = iAntiLimit * 100
+    end
+    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_CLUB_SETTING_ANTI_MEMBER, "ddbdi", dwClubID, dwOperatorID, bOperatorType, dwTargetID, iAntiLimit)
+end
+
+--请求沉迷刷新日志
+function Guild:getClubAntiLog(dwClubID, dwUserID, bOperatorType, dwStartTime, dwEndTime, bPageIndex)
+    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_CLUB_ANTI_REFRESH_LOG, "ddbddb", dwClubID, dwUserID, bOperatorType, dwStartTime, dwEndTime, bPageIndex)
+end
+
+-- 再来一局
+function Guild:sendMatchClubTable(dwUserID, dwClubID, dwPlayID)
+    NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB, NetMsgId.REQ_MATCH_CLUB_TABLE, "ddd", dwUserID, dwClubID, dwPlayID)
 end
 
 return Guild

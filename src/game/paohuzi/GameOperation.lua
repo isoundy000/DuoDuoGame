@@ -154,13 +154,8 @@ function GameOperation:onCreate(opType,cbOperateCode,cbOperateCard,cbCardIndex,c
             local item = self.Button_operation:clone()
             item:loadTextures("game/op_hu.png","game/op_hu.png","game/op_hu.png")
             item:setPressedActionEnabled(true)
-            if CHANNEL_ID ~= 0 and CHANNEL_ID ~= 1 and
-				CHANNEL_ID ~= 2 and CHANNEL_ID ~= 3 and
-				CHANNEL_ID ~= 6 and CHANNEL_ID ~= 7 and
-				CHANNEL_ID ~= 20 and CHANNEL_ID ~= 21 and
-				CHANNEL_ID ~= 10 and CHANNEL_ID ~= 11 and CHANNEL_ID ~= 26 and CHANNEL_ID ~= 27 or GameCommon.tableConfig.wKindID == 44 then 
-                GameCommon.IsOfHu = 1
-            end
+            GameCommon.IsOfHu = 1
+            GameCommon.iNOoutcard = true
             if  GameCommon.tableConfig.wKindID == 39 or GameCommon.tableConfig.wKindID == 16  then       
                 self:runAction(cc.Sequence:create(cc.DelayTime:create(1),cc.CallFunc:create(function(sender,event)  self:dealHu() item:setVisible(false) end)))      
             end 
@@ -232,15 +227,8 @@ function GameOperation:onCreate(opType,cbOperateCode,cbOperateCard,cbCardIndex,c
                         self:dealHu()
                     end 
                 end)
-
-                if CHANNEL_ID ~= 0 and CHANNEL_ID ~= 1 and
-				CHANNEL_ID ~= 2 and CHANNEL_ID ~= 3 and
-				CHANNEL_ID ~= 6 and CHANNEL_ID ~= 7 and
-				CHANNEL_ID ~= 20 and CHANNEL_ID ~= 21 and
-				CHANNEL_ID ~= 10 and CHANNEL_ID ~= 11 and CHANNEL_ID ~= 26 and CHANNEL_ID ~= 27 or GameCommon.tableConfig.wKindID == 44 then 
-                    GameCommon.IsOfHu = 1
-                end
-
+                GameCommon.IsOfHu = 1
+                GameCommon.iNOoutcard = true
                 if GameCommon.tableConfig.wKindID == 33 or GameCommon.tableConfig.wKindID == 34 or GameCommon.tableConfig.wKindID == 35 or GameCommon.tableConfig.wKindID == 36 or GameCommon.tableConfig.wKindID == 32 or GameCommon.tableConfig.wKindID == 37 or GameCommon.tableConfig.wKindID == 27 or GameCommon.tableConfig.wKindID == 31 then
                     if Bit:_and(cbSubOperateCode,0x0800) ~= 0  then
                         local img = ccui.ImageView:create("zipai/table/end_play_3wcw.png")

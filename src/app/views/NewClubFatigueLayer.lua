@@ -138,7 +138,7 @@ function NewClubFatigueLayer:listViewFatigueEventListen(sender, evenType)
             if self.Image_log:isVisible() then
                 UserData.Guild:getClubFatigueRecord(self.clubData.dwClubID, UserData.User.userID, self.recordPage, 3)
             else
-                UserData.Guild:getClubFatigueRecord(self.clubData.dwClubID, UserData.User.userID, self.recordPage)
+                UserData.Guild:getClubFatigueRecord(self.clubData.dwClubID, self.curSelUserId, self.recordPage)
             end
         end
     end
@@ -301,7 +301,8 @@ function NewClubFatigueLayer:loadMemerItem(item, data)
         self.ListView_pushOperate:removeAllItems()
         self.recordPage = 1
         self.recordState = 0
-        UserData.Guild:getClubFatigueRecord(data.dwClubID, data.dwUserID, 1)
+        self.curSelUserId = data.dwUserID
+        UserData.Guild:getClubFatigueRecord(data.dwClubID, self.curSelUserId, 1)
     end)
 end
 
@@ -390,7 +391,11 @@ function NewClubFatigueLayer:RET_GET_CLUB_MEMBER_FATIGUE_RECORD(event)
         Text_snum:setColor(cc.c3b(131, 88, 45))
         Text_des:setColor(cc.c3b(131, 88, 45))
         Text_time:setString(os.date('%m-%d %H:%M', data.dwOperTime))
-        Text_playway:setString(StaticData.Games[data.wKindID].name)
+        if StaticData.Games[data.wKindID] then
+            Text_playway:setString(StaticData.Games[data.wKindID].name)
+        else
+            Text_playway:setString('')
+        end
         if data.lFatigue >= 0 then
             Text_type:setString('游戏收益')
             Text_xnum:setString('+' .. data.lFatigue)
@@ -431,7 +436,11 @@ function NewClubFatigueLayer:RET_GET_CLUB_MEMBER_FATIGUE_RECORD(event)
         Text_snum:setColor(cc.c3b(131, 88, 45))
         Text_des:setColor(cc.c3b(131, 88, 45))
         Text_time:setString(os.date('%m-%d %H:%M', data.dwOperTime))
-        Text_playway:setString(StaticData.Games[data.wKindID].name)
+        if StaticData.Games[data.wKindID] then
+            Text_playway:setString(StaticData.Games[data.wKindID].name)
+        else
+            Text_playway:setString('')
+        end
         if data.lFatigue >= 0 then
             Text_type:setString('对局收益')
             Text_xnum:setString('+' .. data.lFatigue)
@@ -498,7 +507,11 @@ function NewClubFatigueLayer:RET_GET_CLUB_MEMBER_FATIGUE_RECORD(event)
         Text_snum:setColor(cc.c3b(131, 88, 45))
         Text_des:setColor(cc.c3b(131, 88, 45))
         Text_time:setString(os.date('%m-%d %H:%M', data.dwOperTime))
-        Text_playway:setString(StaticData.Games[data.wKindID].name)
+        if StaticData.Games[data.wKindID] then
+            Text_playway:setString(StaticData.Games[data.wKindID].name)
+        else
+            Text_playway:setString('')
+        end
         Text_type:setString('游戏消耗')
         Text_xnum:setString('-' .. data.lFatigue)
         Text_snum:setString(data.lNewFatigue)
@@ -622,9 +635,11 @@ function NewClubFatigueLayer:RET_SETTINGS_CLUB_MEMBER(event)
         elseif data.lRet == 5 then
             require("common.MsgBoxLayer"):create(0,nil,"您的权限不足!")
         elseif data.lRet == 100 then
-            require("common.MsgBoxLayer"):create(0,nil,"对局中不能修改疲劳值")
+            require("common.MsgBoxLayer"):create(0,nil,"对局中不能减少疲劳值!")
+        elseif data.lRet == 12 then
+            require("common.MsgBoxLayer"):create(0,nil,"超层级上限不能设置合伙人!")
         else
-            require("common.MsgBoxLayer"):create(0,nil,"设置错误!")
+            require("common.MsgBoxLayer"):create(0,nil,"设置错误! code=" .. data.lRet)
         end
         return
     end

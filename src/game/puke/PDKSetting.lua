@@ -32,7 +32,7 @@ end
 function PDKSetting:initValue(...)
 	self.music			= Music:getVolumeMusic()  --音乐 
 	self.effectMusic 	= Music:getVolumeSound()		--音效
-	self.size = self:getDefaultValue('PDKSize',1) --1 小 2 大
+	self.size = self:getDefaultValue('PDKSize',2) --1 小 2 大
 	self.bgNum = self:getDefaultValue('PDKBgNum',4) --1 2 3 4 依次
 	--是否开启音效
 	self.isShowVoice = UserData.Music:getVolumeVoice() > 0-- >0显示

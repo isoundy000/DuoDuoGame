@@ -246,15 +246,15 @@ function UserInfoLayer:updateUserInfo()
         uiButton_phone:loadTextures("user/newuser_genhuan.png","user/newuser_genhuan.png","user/newuser_genhuan.png")
     end
 
-    local uiButton_xianLiao = ccui.Helper:seekWidgetByName(self.root,"Button_xianLiao")
-    local uiText_xianLiao = ccui.Helper:seekWidgetByName(self.root,"Text_xianLiao")
-    if UserData.User.szXianLiaoCode == "" then
-        uiText_xianLiao:setString("未绑定")
-        uiButton_xianLiao:loadTextures("user/bind.png","user/bind.png","user/bind.png")
-    else
-        uiText_xianLiao:setString("已绑定")
-        uiButton_xianLiao:loadTextures("user/newuser_genhuan.png","user/newuser_genhuan.png","user/newuser_genhuan.png")
-    end
+    -- local uiButton_xianLiao = ccui.Helper:seekWidgetByName(self.root,"Button_xianLiao")
+    -- local uiText_xianLiao = ccui.Helper:seekWidgetByName(self.root,"Text_xianLiao")
+    -- if UserData.User.szXianLiaoCode == "" then
+    --     uiText_xianLiao:setString("未绑定")
+    --     uiButton_xianLiao:loadTextures("user/bind.png","user/bind.png","user/bind.png")
+    -- else
+    --     uiText_xianLiao:setString("已绑定")
+    --     uiButton_xianLiao:loadTextures("user/newuser_genhuan.png","user/newuser_genhuan.png","user/newuser_genhuan.png")
+    -- end
 
 end
 

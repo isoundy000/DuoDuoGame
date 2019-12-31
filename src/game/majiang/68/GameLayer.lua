@@ -1072,7 +1072,19 @@ function GameLayer:EVENT_TYPE_OPERATIONAL_OUT_CARD(event)
     if cbCardData == 0x31 then
         return
     end
-    NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OUT_CARD,"b",cbCardData)
+    if GameCommon.IsOfHu == 1 then  --如果是胡牌
+        require("common.MsgBoxLayer"):create(1,nil,"是否放弃胡牌？",function()  
+            if GameCommon.iNOoutcard == true then --当前是明牌
+                NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OPERATE_CARD,"wb",GameCommon.WIK_NULL,0)
+            end
+            NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OUT_CARD,"b",cbCardData)
+        end)  
+    else
+        if GameCommon.iNOoutcard == true then --当前是明牌
+            NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OPERATE_CARD,"wb",GameCommon.WIK_NULL,0)
+        end
+        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OUT_CARD,"b",cbCardData)
+    end
 end
 
 function GameLayer:SUB_GR_USER_ENTER(event)

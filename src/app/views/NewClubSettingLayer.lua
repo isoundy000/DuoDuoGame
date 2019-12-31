@@ -43,8 +43,10 @@ function NewClubSettingLayer:onConfig()
         {"Image_partnerFrame"},
         {"Image_one", "onOnePartner"},
         {"Image_two", "onMorePartner"},
-        {"Text_oneValue"},
+        {"Image_three", "onThreePartner"},
         {"Button_oneSet", "onOneSet"},
+        {"Text_one"},
+        {"Text_oneValue"},
         {"Text_two"},
         {"Text_twoValue"},
         {"Button_twoSet", "onTwoSet"},
@@ -59,6 +61,9 @@ function NewClubSettingLayer:onConfig()
         {"Text_jtValue"},
         {"Button_jtSet", "onJTSet"},
         {"Button_save", "onPartnerSave"},
+
+        {"Panel_oldMode"},
+        {"Button_setPercent", "onSetPercent"},
     }
     self.curSelType = 0
 end
@@ -87,6 +92,10 @@ function NewClubSettingLayer:onCreate(param)
 	else
 		self.Button_partnerSet:setVisible(false)
 	end
+
+    if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+        self.Button_partnerSet:setVisible(false)
+    end
 end
 
 function NewClubSettingLayer:onClose()
@@ -149,15 +158,35 @@ end
 function NewClubSettingLayer:onOnePartner()
     self.Image_one:getChildByName('Image_light'):setVisible(true)
     self.Image_two:getChildByName('Image_light'):setVisible(false)
+    self.Image_three:getChildByName('Image_light'):setVisible(false)
+    self.Text_one:setVisible(true)
     self.Text_two:setVisible(false)
     self.Text_three:setVisible(false)
+    self.Button_setPercent:setVisible(false)
 end
 
 function NewClubSettingLayer:onMorePartner()
     self.Image_one:getChildByName('Image_light'):setVisible(false)
     self.Image_two:getChildByName('Image_light'):setVisible(true)
+    self.Image_three:getChildByName('Image_light'):setVisible(false)
+    self.Text_one:setVisible(true)
     self.Text_two:setVisible(true)
     self.Text_three:setVisible(true)
+    self.Button_setPercent:setVisible(false)
+end
+
+function NewClubSettingLayer:onThreePartner()
+    self.Image_one:getChildByName('Image_light'):setVisible(false)
+    self.Image_two:getChildByName('Image_light'):setVisible(false)
+    self.Image_three:getChildByName('Image_light'):setVisible(true)
+    self.Text_one:setVisible(false)
+    self.Text_two:setVisible(false)
+    self.Text_three:setVisible(false)
+    self.Button_setPercent:setVisible(true)
+end
+
+function NewClubSettingLayer:onSetPercent()
+    self:addChild(require("app.MyApp"):create(self.clubData, 4):createView("NewClubPartnerLayer"))
 end
 
 function NewClubSettingLayer:onOneSet()
@@ -244,8 +273,10 @@ end
 
 function NewClubSettingLayer:onPartnerSave()
     local bMode = 0
-    if not self.Image_one:getChildByName('Image_light'):isVisible() then
+    if self.Image_two:getChildByName('Image_light'):isVisible() then
         bMode = 1
+    elseif self.Image_three:getChildByName('Image_light'):isVisible() then
+        bMode = 2
     end
 
     local oneStr = self.Text_oneValue:getString()
@@ -325,6 +356,7 @@ function NewClubSettingLayer:switchType(itype)
 		self.Image_showFrame:setVisible(false)
 		self.Image_hideFrame:setVisible(false)
 		self.Image_partnerFrame:setVisible(true)
+        self.Button_setPercent:setVisible(false)
 		UserData.Guild:getPartnerConfig(UserData.User.userID, self.clubData.dwClubID)
 	end
 
@@ -352,6 +384,10 @@ function NewClubSettingLayer:initBasePage()
         self.TextField_name:setColor(cc.c3b(170,170,170))
         self.TextField_notice:setTouchEnabled(false)
         self.TextField_notice:setColor(cc.c3b(170,170,170))
+    end
+
+    if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+        self.Button_liveClub:setVisible(false)
     end
 end
 
@@ -418,6 +454,12 @@ function NewClubSettingLayer:initHidePage()
        		end
        	end
        	self.ListView_hide:setTouchEnabled(false)
+    end
+
+    if not (CHANNEL_ID == 26 or CHANNEL_ID == 27) then
+        if items[8] then
+            items[8]:removeFromParent()
+        end
     end
 
 	for i,v in ipairs(items) do
@@ -496,6 +538,16 @@ function NewClubSettingLayer:initHidePage()
 		       	Image_selLeft:getChildByName('Image_selLight'):setVisible(true)
     			Image_selRight:getChildByName('Image_selLight'):setVisible(false)
 		    end
+
+        elseif i == 8 then
+            -- 防沉迷开关
+            if Bit:_and(0x20, self.clubData.bIsDisable) == 0x20 then
+                Image_selLeft:getChildByName('Image_selLight'):setVisible(false)
+                Image_selRight:getChildByName('Image_selLight'):setVisible(true)
+            else
+                Image_selLeft:getChildByName('Image_selLight'):setVisible(true)
+                Image_selRight:getChildByName('Image_selLight'):setVisible(false)
+            end
 
     	end
 
@@ -583,6 +635,16 @@ function NewClubSettingLayer:selectHideItem(index, isLeft)
 		NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB3,"bdnsonsddd",
                 6,self.clubData.dwClubID,32,nickName,false,256,"",0,bitVal,0)
 
+    elseif index == 8 then
+        local bitVal = 0
+        if isLeft then
+            bitVal = Bit:_and(self.clubData.bIsDisable, 0xDF)
+        else
+            bitVal = Bit:_or(self.clubData.bIsDisable, 0x20)
+        end
+        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB3,"bdnsonsddd",
+                6,self.clubData.dwClubID,32,nickName,false,256,"",0,bitVal,0)
+
 	end
 end
 
@@ -646,13 +708,27 @@ function NewClubSettingLayer:RET_SETTINGS_CONFIG(event)
     if data.bDistributionModel == 0 then
         self.Image_one:getChildByName('Image_light'):setVisible(true)
         self.Image_two:getChildByName('Image_light'):setVisible(false)
+        self.Image_three:getChildByName('Image_light'):setVisible(false)
+        self.Text_one:setVisible(true)
         self.Text_two:setVisible(false)
         self.Text_three:setVisible(false)
-    else
+        self.Button_setPercent:setVisible(false)
+    elseif data.bDistributionModel == 1 then
         self.Image_one:getChildByName('Image_light'):setVisible(false)
         self.Image_two:getChildByName('Image_light'):setVisible(true)
+        self.Image_three:getChildByName('Image_light'):setVisible(false)
+        self.Text_one:setVisible(true)
         self.Text_two:setVisible(true)
         self.Text_three:setVisible(true)
+        self.Button_setPercent:setVisible(false)
+    else
+        self.Image_one:getChildByName('Image_light'):setVisible(false)
+        self.Image_two:getChildByName('Image_light'):setVisible(false)
+        self.Image_three:getChildByName('Image_light'):setVisible(true)
+        self.Text_one:setVisible(false)
+        self.Text_two:setVisible(false)
+        self.Text_three:setVisible(false)
+        self.Button_setPercent:setVisible(true)
     end
 
     self.Text_oneValue:setString(data.bDistributionRatio1 .. '%')
@@ -685,8 +761,12 @@ end
 function NewClubSettingLayer:RET_SETTINGS_PAPTNER(event)
     local data = event._usedata
     if data.lRet ~= 0 then
-        require("common.MsgBoxLayer"):create(0,nil,"设置保存失败！")
-        return 
+        if data.lRet == 4 then
+            require("common.MsgBoxLayer"):create(0,nil,"当前模式只支持三级，请取消三级以下的合伙人身份!")
+        else
+            require("common.MsgBoxLayer"):create(0,nil,"设置保存失败！ code="..data.lRet)
+        end
+        return
     end
     require("common.MsgBoxLayer"):create(0,nil,"设置保存成功！")
 end

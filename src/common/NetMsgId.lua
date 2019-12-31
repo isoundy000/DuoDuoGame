@@ -229,12 +229,12 @@ local NetMsgId = {
     RET_GET_CLUB_LIST3                  = 24005,                           --返回亲友圈列表
     REQ_REFRESH_CLUB3                   = 2402,                            --请求刷新亲友圈
     RET_REFRESH_CLUB3                   = 24002,                           --返回刷新亲友圈
-    REQ_SETTINGS_CLUB_PLAY              = 2330,                            --请求设置亲友圈玩法
-    RET_SETTINGS_CLUB_PLAY              = 23030,                           --返回设置亲友圈玩法
-    RET_SETTINGS_CLUB_PLAY_FINISH       = 23031,
-    REQ_REFRESH_CLUB_PLAY3              = 2332,                            --请求刷新俱乐部玩法
-    RET_REFRESH_CLUB_PLAY               = 23032,                           --返回刷新俱乐部玩法
-    RET_REFRESH_CLUB_PLAY_FINISH        = 23033,
+    REQ_SETTINGS_CLUB_PLAY              = 2335,                            --请求设置亲友圈玩法
+    RET_SETTINGS_CLUB_PLAY              = 23035,                           --返回设置亲友圈玩法
+    RET_SETTINGS_CLUB_PLAY_FINISH       = 23036,
+    REQ_REFRESH_CLUB_PLAY3              = 2337,                            --请求刷新俱乐部玩法
+    RET_REFRESH_CLUB_PLAY               = 23037,                           --返回刷新俱乐部玩法
+    RET_REFRESH_CLUB_PLAY_FINISH        = 23038,
 
     REQ_SETTINGS_CONFIG                 = 2222,                             --请求合伙人配置
     RET_SETTINGS_CONFIG                 = 22022,                            --返回合伙人配置
@@ -279,8 +279,22 @@ local NetMsgId = {
     REQ_FIND_CLUB_ONLINE_MEMBER         = 37,                              --查找亲友圈在线成员
     RET_FIND_CLUB_ONLINE_MEMBER         = 140,                             --查找亲友圈在线成员
 
+    REQ_CLUB_ANTI_LIMIT                 = 2501,                            --请求防沉迷设置下限值,
+    RET_CLUB_ANTI_LIMIT                 = 25001,                           --返回防沉迷设置下限值
+    REQ_CLUB_SETTING_ANTI_LIMIT         = 2502,                            --请求设置亲有圈沉迷下限
+    RET_CLUB_SETTING_ANTI_LIMIT         = 25002,                           --返回设置亲有圈沉迷下限
+    REQ_CLUB_ANTI_LIST                  = 2503,                            --请求防沉迷成员列表
+    RET_CLUB_ANTI_LIST                  = 25003,                           --返回防沉迷成员列表
+    RET_CLUB_ANTI_LIST_FINISH           = 25004,                           --完成
+    REQ_CLUB_SETTING_ANTI_MEMBER        = 2505,                            --设置成员沉迷信息
+    RET_CLUB_SETTING_ANTI_MEMBER        = 25005,                           --返回成员沉迷信息
+    REQ_CLUB_ANTI_REFRESH_LOG           = 2506,                            --请求沉迷刷新日志
+    RET_CLUB_ANTI_REFRESH_LOG           = 25006,                           --返回沉迷刷新日志
+    RET_CLUB_ANTI_REFRESH_LOG_FINISH    = 25007,
+
+
     --统计
-    REQ_GET_CLUB_STATISTICS_MYSELF      = 1657,                             --//请求亲友圈统计个人
+    REQ_GET_CLUB_STATISTICS_MYSELF      = 1657,                             ----请求亲友圈统计个人
 
     RET_GET_CLUB_STATISTICS_MYSELF		= 16057,						--返回亲友圈统计个人
 
@@ -311,8 +325,9 @@ local NetMsgId = {
     REQ_GET_CLUB_NOT_PARTNER_MEMBER     = 1670,                            --请求亲友圈非合伙人成员
     RET_GET_CLUB_NOT_PARTNER_MEMBER     = 16070,                           --返回亲友圈非合伙人成员
     RET_GET_CLUB_NOT_PARTNER_MEMBER_FINISH = 16071,                        --返回亲友圈非合伙人成员
-    REQ_FIND_CLUB_NOT_PARTNER_MEMBER    = 1672,                            --请求查找亲友圈非合伙人成员
-    RET_FIND_CLUB_NOT_PARTNER_MEMBER    = 16072,                           --返回查找亲友圈非合伙人成员
+    REQ_FIND_CLUB_NOT_PARTNER_MEMBER    = 2240,                            --请求查找亲友圈非合伙人成员
+    RET_FIND_CLUB_NOT_PARTNER_MEMBER    = 22040,                           --返回查找亲友圈非合伙人成员
+    RET_FIND_CLUB_NOT_PARTNER_MEMBER_FINISH = 22041,
     REQ_FIND_CLUB_PARTNER_MEMBER        = 2310,                            --查找亲友圈合伙人成员
     RET_FIND_CLUB_PARTNER_MEMBER        = 23010,                           --返回查找亲友圈合伙人成员
 
@@ -429,10 +444,10 @@ local NetMsgId = {
     REQ_GR_USER_NEXT_GAME = 6,      --下一局    
     REQ_GR_USER_PLAYER_INFO=4,     --获取玩家信息
     SUB_GF_USER_EXPRESSION = 500,   --用户表情
-    SUB_GF_USER_EFFECTS		=		503, -- //用户特效
+    SUB_GF_USER_EFFECTS		=		503, -- --用户特效
     SUB_GF_USER_VOICE = 501,       --语音
 
-    SUB_GF_USER_VOICE_YAYA	= 504, --//丫丫用户语音
+    SUB_GF_USER_VOICE_YAYA	= 504, ----丫丫用户语音
 
     REQ_GR_USER_PLAYER_INFO = 3,  --用户聊天接收
     SUB_GR_SEND_CHAT = 105,  --用户聊天转发
@@ -517,11 +532,11 @@ local NetMsgId = {
     SUB_S_JIA_PIAO = 153,
     SUB_S_JIA_PIAO_80 = 154 ,
     --聊天
-    REQ_ADD_CLUB_CHAT_REFRESH_MEMBER = 1688, -- //添加聊天及时刷新列表
+    REQ_ADD_CLUB_CHAT_REFRESH_MEMBER = 1688, -- --添加聊天及时刷新列表
 
-    REQ_DEL_CLUB_CHAT_REFRESH_MEMBER = 1689, -- //删除聊天及时刷新列表
+    REQ_DEL_CLUB_CHAT_REFRESH_MEMBER = 1689, -- --删除聊天及时刷新列表
 
-    REQ_CLUB_CHAT_RECORD = 1680, -- //请求聊天记录
+    REQ_CLUB_CHAT_RECORD = 1680, -- --请求聊天记录
 
     RET_CLUB_CHAT_RECORD   = 16080,--返回聊天记录
 

@@ -45,7 +45,7 @@ end
 
 function NewClubParnterAddMemLayer:onAddMem()
 	local roomNumber = ""
-    for i = 1 , 8 do
+    for i = 1 , 6 do
         local numName = string.format("Text_number%d", i)
         local Text_number = ccui.Helper:seekWidgetByName(self.Image_inputFrame, numName)
         if Text_number:getString() == "" then
@@ -120,7 +120,7 @@ end
 
 --重置数字
 function NewClubParnterAddMemLayer:resetNumber()
-    for i = 1 , 8 do
+    for i = 1 , 6 do
         local numName = string.format("Text_number%d", i)
         local Text_number = ccui.Helper:seekWidgetByName(self.Image_inputFrame, numName)
         if Text_number then
@@ -132,7 +132,7 @@ end
 --输入数字
 function NewClubParnterAddMemLayer:inputNumber(num)
     local roomNumber = ""
-    for i = 1 , 8 do
+    for i = 1 , 6 do
         local numName = string.format("Text_number%d", i)
         local Text_number = ccui.Helper:seekWidgetByName(self.Image_inputFrame, numName)
         if Text_number:getString() == "" then
@@ -150,7 +150,7 @@ end
 
 --删除数字
 function NewClubParnterAddMemLayer:deleteNumber()
-    for i = 8 , 1 , -1 do
+    for i = 6 , 1 , -1 do
         local numName = string.format("Text_number%d", i)
         local Text_number = ccui.Helper:seekWidgetByName(self.Image_inputFrame, numName)
         if Text_number:getString() ~= "" then

@@ -117,7 +117,7 @@ end
 
 function NewClubNoticeLayer:onAddMem()
     local id = ""
-    for i = 1 , 8 do
+    for i = 1 , 6 do
         local numName = string.format("Text_number%d", i)
         local Text_number = ccui.Helper:seekWidgetByName(self.Image_inputFrame, numName)
         if Text_number:getString() == "" then
@@ -433,7 +433,7 @@ function NewClubNoticeLayer:RET_ADD_CLUB_MEMBER(event)
         elseif data.lRet == 2 then
             require("common.MsgBoxLayer"):create(0,self,"该成员已在亲友圈内，请勿重复操作!")
         elseif data.lRet == 3 then
-            require("common.MsgBoxLayer"):create(0,self,"玩家ID不合法!")
+            require("common.MsgBoxLayer"):create(0,self,"玩家不存在!")
         elseif data.lRet == 4 then
             require("common.MsgBoxLayer"):create(0,self,"您没有权限导入！")
         elseif data.lRet == 5 then
@@ -637,7 +637,7 @@ end
 
 --重置数字
 function NewClubNoticeLayer:resetNumber()
-    for i = 1 , 8 do
+    for i = 1 , 6 do
         local numName = string.format("Text_number%d", i)
         local Text_number = ccui.Helper:seekWidgetByName(self.Image_inputFrame, numName)
         if Text_number then
@@ -650,13 +650,13 @@ end
 --输入数字
 function NewClubNoticeLayer:inputNumber(num)
     local roomNumber = ""
-    for i = 1 , 8 do
+    for i = 1 , 6 do
         local numName = string.format("Text_number%d", i)
         local Text_number = ccui.Helper:seekWidgetByName(self.Image_inputFrame, numName)
         if Text_number:getString() == "" then
             Text_number:setString(tostring(num))
             roomNumber = roomNumber .. Text_number:getString()
-            if i == 8 then
+            if i == 6 then
                 -- UserData.Guild:addClubMember(self.clubData.dwClubID, tonumber(roomNumber), UserData.User.userID)
             end
             break
@@ -670,7 +670,7 @@ end
 --删除数字
 function NewClubNoticeLayer:deleteNumber()
 	local delIndex = 0
-    for i = 8 , 1 , -1 do
+    for i = 6 , 1 , -1 do
         local numName = string.format("Text_number%d", i)
         local Text_number = ccui.Helper:seekWidgetByName(self.Image_inputFrame, numName)
         if Text_number:getString() ~= "" then

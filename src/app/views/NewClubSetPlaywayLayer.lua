@@ -303,11 +303,17 @@ function NewClubSetPlaywayLayer:initPlaywayItem(item, count, index)
     else
         des = '圈主模式/'
     end
-
-    if self.clubData.isTableCharge[index] then
-	    des = des .. string.format('倍率:%d/门槛:%d/解散限制:%d/', self.clubData.wFatigueCell[index], self.clubData.lTableLimit[index], self.clubData.lFatigueLimit[index])
-	end
-
+    
+    if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+        if self.clubData.wAntiCell[index] and self.clubData.wAntiCell[index] ~= 0 then
+            des = des .. string.format('倍率:%d/', self.clubData.wAntiCell[index])
+        end
+    else
+        if self.clubData.isTableCharge[index] then
+            des = des .. string.format('倍率:%d/门槛:%d/解散限制:%d/', self.clubData.wFatigueCell[index], self.clubData.lTableLimit[index], self.clubData.lFatigueLimit[index])
+        end
+    end
+    
     local cbPayMode = self.clubData.cbPayMode[index]
     if not (UserData.User.userID == self.clubData.dwUserID or self:isAdmin(UserData.User.userID)) and 
         not (Bit:_and(0x10, self.clubData.bIsDisable) == 0x10) then
@@ -318,7 +324,7 @@ function NewClubSetPlaywayLayer:initPlaywayItem(item, count, index)
         elseif cbPayMode == 3 then
             des = des .. 'AA支付'
         else
-            des = des .. '免费'
+            --des = des .. '免费'
         end
     else
         if cbPayMode == 1 then
@@ -328,7 +334,7 @@ function NewClubSetPlaywayLayer:initPlaywayItem(item, count, index)
         elseif cbPayMode == 3 then
             des = des .. string.format('AA支付:%d', self.clubData.dwPayCount[index][1])
         else
-            des = des .. '免费'
+            --des = des .. '免费'
         end
     end
 

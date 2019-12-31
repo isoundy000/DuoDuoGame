@@ -91,9 +91,24 @@ function RoomCreateLayer:onCreate(parameter)
             if uiText_desc ~= nil then 
                 uiText_desc:setTextColor(cc.c3b(109,58,44))
             end
+
+           
         elseif var:isBright() == false then
             var:setEnabled(true)
             var:setColor(cc.c3b(255,255,255))
+        end
+
+        if index == 2 then
+            items[2]:setEnabled(true)
+            items[2]:setColor(cc.c3b(255,255,255))  
+        else
+            items[2]:setBright(false)
+            items[2]:setEnabled(false)
+            items[2]:setColor(cc.c3b(170,170,170))
+            local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+            if uiText_desc ~= nil then 
+                uiText_desc:setTextColor(cc.c3b(109,58,44))
+            end
         end
     end)
     if self.recordCreateParameter["bPlayerCount"] ~= nil and self.recordCreateParameter["bPlayerCount"] == 2 then
@@ -259,6 +274,30 @@ function RoomCreateLayer:onCreate(parameter)
             uiText_desc:setTextColor(cc.c3b(109,58,44))
         end
     end    
+
+    if self.recordCreateParameter["bPlayerCount"] == nil or self.recordCreateParameter["bPlayerCount"] ~= 2 then
+        items[2]:setBright(false)
+        items[2]:setEnabled(false)
+        items[2]:setColor(cc.c3b(170,170,170))
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(109,58,44))
+        end
+    elseif self.recordCreateParameter["bDeathCard"] ~= nil and self.recordCreateParameter["bDeathCard"] == 1 then
+        items[2]:setBright(true)
+        items[2]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(238,105,40))
+        end
+    else
+        items[2]:setBright(false)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(109,58,44))
+        end
+    end    
+
     if self.showType == 3 then
         self.tableFriendsRoomParams = {[1] = {wGameCount = 1}}
         self:SUB_CL_FRIENDROOM_CONFIG_END()
@@ -396,6 +435,12 @@ function RoomCreateLayer:onEventCreate(nTableType)
     else
         tableParameter.bTurn = 0
     end
+
+    if items[2]:isBright() then
+        tableParameter.bDeathCard = 1
+    else
+        tableParameter.bDeathCard = 0
+    end
     tableParameter.FanXing = {}
     tableParameter.FanXing.bType = 0
     tableParameter.FanXing.bCount = 0
@@ -411,7 +456,7 @@ function RoomCreateLayer:onEventCreate(nTableType)
     tableParameter.dwMingTang = 0
     self.nTableType = nTableType
 
-    tableParameter.bDeathCard = 0
+    --tableParameter.bDeathCard = 0
     tableParameter.bStartBanker = 0
    
    if self.showType ~= 2 and (nTableType == TableType_FriendRoom or nTableType == TableType_HelpRoom) then

@@ -359,6 +359,9 @@ function GameEndLayer:showMingTang(pBuffer)
     self.PHZ_HT_ZHUOXIAOSAN                  = 0x20000             --捉小三(8)   自摸小三胡牌（X 8倍）
     self.PHZ_HT_SIQIHONG					 = 0x40000             --四七红 2番
     self.PHZ_HT_HANGHANGXINGJ4               = 0x80000			   --假行行息 4番
+
+    self.PHZ_HT_BEIKAOBEI					 = 0x100000             --背靠背 8番
+    self.PHZ_HT_MANYUANHUA               = 0x200000			   --满园花 20番
     local uiListView_player = ccui.Helper:seekWidgetByName(self.root,"ListView_player")
     local uiPanel_defaultPalyer = ccui.Helper:seekWidgetByName(self.root,"Panel_defaultPalyer")
     uiPanel_defaultPalyer:retain()
@@ -446,158 +449,385 @@ function GameEndLayer:showMingTang(pBuffer)
     end
    
     --胡牌类型大字胡，小胡子，红乌需要计算基数
+    -- if wHZCount>=10 then
+    --     local item = uiPanel_defaultPalyer:clone()
+    --     self:createMingTang(item,"honghu",3 +wHZCount-10,"","fan")
+    --     uiListView_player:pushBackCustomItem(item)
+    -- end
+
     if wHZCount>=10 then
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"honghu",3 +wHZCount-10,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("红胡")
+        uiText_mingTangNumber:setString(string.format("+%d番",3 +wHZCount-10)) 
         uiListView_player:pushBackCustomItem(item)
     end
-    if wDZCount >= 18 and wDZCount < 27 then
-        local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"dazihu",8+wDZCount-18,"","fan")
-        uiListView_player:pushBackCustomItem(item)
 
-    elseif wXZCount >= 16 and wXZCount < 27 then
+    if wDZCount >= 18 and wDZCount < 27 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"dazihu",8+wDZCount-18,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
+
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"xiaozihu",10+wXZCount-16,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("大字胡")
+        uiText_mingTangNumber:setString(string.format("+%d番",8+wDZCount-18)) 
         uiListView_player:pushBackCustomItem(item)
-                
+    elseif wXZCount >= 16 and wXZCount < 27 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"xiaozihu",10+wXZCount-16,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
+
+        local item = uiPanel_defaultPalyer:clone()
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("小字胡")
+        uiText_mingTangNumber:setString(string.format("+%d番",10+wXZCount-16)) 
+        uiListView_player:pushBackCustomItem(item)                
     end
 
     --自摸判断
+    -- if Bit:_and(pBuffer.wType,self.PHZ_HT_ZIMO)~= 0 then
+    --     local item = uiPanel_defaultPalyer:clone()
+    --     self:createMingTang(item,"zimo",1,"+","tun")
+    --     uiListView_player:pushBackCustomItem(item)      
+    -- end 
+
     if Bit:_and(pBuffer.wType,self.PHZ_HT_ZIMO)~= 0 then
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"zimo",1,"+","tun")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("自摸")
+        uiText_mingTangNumber:setString("+1囤")
         uiListView_player:pushBackCustomItem(item)
-        
     end 
+
     --捉小三
+    -- if Bit:_and(pBuffer.HuCardInfo.wDType,self.PHZ_HT_ZHUOXIAOSAN) ~= 0 then
+    --     local item = uiPanel_defaultPalyer:clone()
+    --     self:createMingTang(item,"zhuoxiaosan",8,"","fan")
+    --     uiListView_player:pushBackCustomItem(item)
+    -- end
+
     if Bit:_and(pBuffer.HuCardInfo.wDType,self.PHZ_HT_ZHUOXIAOSAN) ~= 0 then
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"zhuoxiaosan",8,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("捉小三")
+        uiText_mingTangNumber:setString("+8番")
         uiListView_player:pushBackCustomItem(item)
-    end
+    end 
     --点胡
+    -- if Bit:_and(pBuffer.wType,self.PHZ_HT_ZHENGDIANHU) ~= 0 then
+    --     local item = uiPanel_defaultPalyer:clone()
+    --     self:createMingTang(item,"dianhu",6,"","fan")
+    --     uiListView_player:pushBackCustomItem(item)       
+    -- end
+
     if Bit:_and(pBuffer.wType,self.PHZ_HT_ZHENGDIANHU) ~= 0 then
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"dianhu",6,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("点胡")
+        uiText_mingTangNumber:setString("+6番")
         uiListView_player:pushBackCustomItem(item)
-        
-    end
+    end 
+    -- if Bit:_and(pBuffer.wType,self.PHZ_HT_HEIWU) ~= 0 then
+    --     local item = uiPanel_defaultPalyer:clone()
+    --     self:createMingTang(item,"heihu",8,"","fan")
+    --     uiListView_player:pushBackCustomItem(item)
+    -- end
+
     if Bit:_and(pBuffer.wType,self.PHZ_HT_HEIWU) ~= 0 then
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"heihu",8,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("黑胡")
+        uiText_mingTangNumber:setString("+8番")
         uiListView_player:pushBackCustomItem(item)
-    end
+    end 
     --四七红
+    -- if Bit:_and(pBuffer.HuCardInfo.wDType,self.PHZ_HT_SIQIHONG) ~= 0 then
+    --     local item = uiPanel_defaultPalyer:clone()
+    --     self:createMingTang(item,"shiqihong",2,"","fan")
+    --     uiListView_player:pushBackCustomItem(item)
+    -- end
+
     if Bit:_and(pBuffer.HuCardInfo.wDType,self.PHZ_HT_SIQIHONG) ~= 0 then
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"shiqihong",2,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("四七红")
+        uiText_mingTangNumber:setString("+2番")
         uiListView_player:pushBackCustomItem(item)
-    end
+    end 
     
     --团圆
     if Bit:_and(pBuffer.wType,self.PHZ_HT_TUANYUAN) ~= 0 then    
         if Bit:_and(GameCommon.gameConfig.dwMingTang,0x10000) ~= 0 then 
+            -- local item = uiPanel_defaultPalyer:clone()
+            -- self:createMingTang(item,"tuanyuan",8*wTYCount,"","fan")
+            -- uiListView_player:pushBackCustomItem(item) 
+
             local item = uiPanel_defaultPalyer:clone()
-            self:createMingTang(item,"tuanyuan",8*wTYCount,"","fan")
-            uiListView_player:pushBackCustomItem(item) 
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("团圆")
+            uiText_mingTangNumber:setString(string.format("+%d番",8*wTYCount))
+            uiListView_player:pushBackCustomItem(item)
         else           
+            -- local item = uiPanel_defaultPalyer:clone()
+            -- self:createMingTang(item,"tuanyuan",8,"","fan")
+            -- uiListView_player:pushBackCustomItem(item)
+
             local item = uiPanel_defaultPalyer:clone()
-            self:createMingTang(item,"tuanyuan",8,"","fan")
+            local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+            uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+            local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+            uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+            uiText_mingTang:setString("团圆")
+            uiText_mingTangNumber:setString("+8番")
             uiListView_player:pushBackCustomItem(item)
         end   
     end
 
     --行行息（真假）
     if Bit:_and(pBuffer.HuCardInfo.wDType,self.PHZ_HT_HANGHANGXINGZ) ~= 0 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"hanghangxin",8,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"hanghangxin",8,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("行行胡")
+        uiText_mingTangNumber:setString("+8番")
         uiListView_player:pushBackCustomItem(item)
     end
+
+
 
     if Bit:_and(pBuffer.HuCardInfo.wDType,self.PHZ_HT_HANGHANGXINGJ4) ~= 0 then    --4番
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"hanghangxin",4,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
+
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"hanghangxin",4,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("行行胡")
+        uiText_mingTangNumber:setString("+4番")
         uiListView_player:pushBackCustomItem(item)
     end
 
+
+
     if Bit:_and(pBuffer.HuCardInfo.wDType,self.PHZ_HT_HANGHANGXINGJ) ~= 0 then     --6番
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"hanghangxin",6,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
+
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"hanghangxin",6,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("行行胡")
+        uiText_mingTangNumber:setString("+6番")
         uiListView_player:pushBackCustomItem(item)
     end
+
+
 
 
     --对对胡=没有吃进的组合、手中没有单牌
     if Bit:_and(pBuffer.wType,self.PHZ_HT_DUIDUIHU) ~= 0 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"duiduihu",8,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
+
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"duiduihu",8,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("对对胡")
+        uiText_mingTangNumber:setString("+8番")
         uiListView_player:pushBackCustomItem(item)
     end
 
+
+
     --天胡和海底
     if Bit:_and(pBuffer.wType , self.PHZ_HT_HAIDI) ~= 0 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"haidihu",6,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
+
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"haidihu",6,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("海底胡")
+        uiText_mingTangNumber:setString("+6番")
         uiListView_player:pushBackCustomItem(item)
     end
+
+
     if Bit:_and(pBuffer.wType,self.PHZ_HT_TIANHU) ~= 0 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"tianhu",12,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
+
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"tianhu",12,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("天胡")
+        uiText_mingTangNumber:setString("+12番")
         uiListView_player:pushBackCustomItem(item)
     end
     
     if Bit:_and(pBuffer.wType,self.PHZ_HT_TINGHU) ~= 0 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"tinghu",6,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
+
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"tinghu",6,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("听胡")
+        uiText_mingTangNumber:setString("+6番")
         uiListView_player:pushBackCustomItem(item)
     end
+
     if Bit:_and(pBuffer.wType,self.PHZ_HT_SHUAHOU) ~= 0 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"shuahou",8,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
+
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"shuahou",8,"","fan")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("耍猴")
+        uiText_mingTangNumber:setString("+8番")
         uiListView_player:pushBackCustomItem(item)
     end
+
     if Bit:_and(pBuffer.wType,self.PHZ_HT_HUANGFAN) ~= 0 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"huangfan",2,"x","bei")
+        -- uiListView_player:pushBackCustomItem(item)
+
         local item = uiPanel_defaultPalyer:clone()
-        self:createMingTang(item,"huangfan",2,"x","bei")
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("黄番")
+        uiText_mingTangNumber:setString("x2倍")
+        uiListView_player:pushBackCustomItem(item)
+    end  
+    
+
+    
+    --
+    if Bit:_and(pBuffer.HuCardInfo.wDType,self.PHZ_HT_BEIKAOBEI) ~= 0 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"shuahou",8,"","fan")
+        -- uiListView_player:pushBackCustomItem(item)
+
+        local item = uiPanel_defaultPalyer:clone()
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("背靠背")
+        uiText_mingTangNumber:setString("+8番")
         uiListView_player:pushBackCustomItem(item)
     end
+
+
+    if Bit:_and(pBuffer.HuCardInfo.wDType,self.PHZ_HT_MANYUANHUA) ~= 0 then
+        -- local item = uiPanel_defaultPalyer:clone()
+        -- self:createMingTang(item,"huangfan",20,"x","bei")
+        -- uiListView_player:pushBackCustomItem(item)
+
+        local item = uiPanel_defaultPalyer:clone()
+        local uiText_mingTang = ccui.Helper:seekWidgetByName(item,"Text_mingTang")
+        uiText_mingTang:setTextColor(cc.c3b(255,165,0))
+        local uiText_mingTangNumber = ccui.Helper:seekWidgetByName(item,"Text_mingTangNumber")
+        uiText_mingTangNumber:setTextColor(cc.c3b(255,165,0))
+        uiText_mingTang:setString("满园花")
+        uiText_mingTangNumber:setString("+20番")
+        uiListView_player:pushBackCustomItem(item)
+    end
+
 
     uiPanel_defaultPalyer:release()
 end
 
-function GameEndLayer:createMingTang(item,mingTang,num,numType,unit)
-    local uiImage_name = ccui.ImageView:create(string.format("zipai/table/end_play_%s.png",mingTang))
-    item:addChild(uiImage_name)
-    uiImage_name:setAnchorPoint(cc.p(0,0.5))
-    uiImage_name:setPosition(cc.p(-uiImage_name:getParent():getContentSize().width*0.2,uiImage_name:getParent():getContentSize().height/2))
+-- function GameEndLayer:createMingTang(item,mingTang,num,numType,unit)
+--     local uiImage_name = ccui.ImageView:create(string.format("zipai/table/end_play_%s.png",mingTang))
+--     item:addChild(uiImage_name)
+--     uiImage_name:setAnchorPoint(cc.p(0,0.5))
+--     uiImage_name:setPosition(cc.p(-uiImage_name:getParent():getContentSize().width*0.2,uiImage_name:getParent():getContentSize().height/2))
 
-    if numType == "+" then--加
-        local uiAtlasLabel_num = ccui.TextAtlas:create(string.format(".%d",num),"fonts/fonts_9.png",18,27,'.')
-        item:addChild(uiAtlasLabel_num)
-        uiAtlasLabel_num:setAnchorPoint(cc.p(1,0.5))
-        uiAtlasLabel_num:setPosition(cc.p(uiAtlasLabel_num:getParent():getContentSize().width*0.8,uiAtlasLabel_num:getParent():getContentSize().height/2))
-    elseif numType == "-" then--减
-        local uiAtlasLabel_num = ccui.TextAtlas:create(string.format(".%d",num),"fonts/fonts_10.png",18,27,'.')
-        item:addChild(uiAtlasLabel_num)
-        uiAtlasLabel_num:setAnchorPoint(cc.p(1,0.5))
-        uiAtlasLabel_num:setPosition(cc.p(uiAtlasLabel_num:getParent():getContentSize().width*0.8,uiAtlasLabel_num:getParent():getContentSize().height/2))
-    else
-        --乘
-        local uiAtlasLabel_num = ccui.TextAtlas:create(string.format("%d",num),"fonts/fonts_8.png",18,27,'.')
-        item:addChild(uiAtlasLabel_num)
-        uiAtlasLabel_num:setAnchorPoint(cc.p(1,0.5))
-        uiAtlasLabel_num:setPosition(cc.p(uiAtlasLabel_num:getParent():getContentSize().width*0.8,uiAtlasLabel_num:getParent():getContentSize().height/2))
-    end
-    if unit ~= "" then
-        local uiImage_type = ccui.ImageView:create(string.format("zipai/table/end_play_%s.png",unit))
-        item:addChild(uiImage_type)
-        uiImage_type:setAnchorPoint(cc.p(0,0.5))
-        uiImage_type:setPosition(cc.p(uiImage_type:getParent():getContentSize().width*0.55,uiImage_type:getParent():getContentSize().height/2))
-    else
+--     if numType == "+" then--加
+--         local uiAtlasLabel_num = ccui.TextAtlas:create(string.format(".%d",num),"fonts/fonts_9.png",18,27,'.')
+--         item:addChild(uiAtlasLabel_num)
+--         uiAtlasLabel_num:setAnchorPoint(cc.p(1,0.5))
+--         uiAtlasLabel_num:setPosition(cc.p(uiAtlasLabel_num:getParent():getContentSize().width*0.8,uiAtlasLabel_num:getParent():getContentSize().height/2))
+--     elseif numType == "-" then--减
+--         local uiAtlasLabel_num = ccui.TextAtlas:create(string.format(".%d",num),"fonts/fonts_10.png",18,27,'.')
+--         item:addChild(uiAtlasLabel_num)
+--         uiAtlasLabel_num:setAnchorPoint(cc.p(1,0.5))
+--         uiAtlasLabel_num:setPosition(cc.p(uiAtlasLabel_num:getParent():getContentSize().width*0.8,uiAtlasLabel_num:getParent():getContentSize().height/2))
+--     else
+--         --乘
+--         local uiAtlasLabel_num = ccui.TextAtlas:create(string.format("%d",num),"fonts/fonts_8.png",18,27,'.')
+--         item:addChild(uiAtlasLabel_num)
+--         uiAtlasLabel_num:setAnchorPoint(cc.p(1,0.5))
+--         uiAtlasLabel_num:setPosition(cc.p(uiAtlasLabel_num:getParent():getContentSize().width*0.8,uiAtlasLabel_num:getParent():getContentSize().height/2))
+--     end
+--     if unit ~= "" then
+--         local uiImage_type = ccui.ImageView:create(string.format("zipai/table/end_play_%s.png",unit))
+--         item:addChild(uiImage_type)
+--         uiImage_type:setAnchorPoint(cc.p(0,0.5))
+--         uiImage_type:setPosition(cc.p(uiImage_type:getParent():getContentSize().width*0.55,uiImage_type:getParent():getContentSize().height/2))
+--     else
     
-    end
-end
+--     end
+-- end
 
 --显示底牌
 function GameEndLayer:showDiPai(pBuffer)

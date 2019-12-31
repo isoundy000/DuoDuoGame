@@ -1561,10 +1561,11 @@ function TableLayer:initUI()
     local uiImage_watermark = ccui.Helper:seekWidgetByName(self.root,"Image_watermark")
     uiImage_watermark:loadTexture(StaticData.Channels[CHANNEL_ID].icon)
     uiImage_watermark:ignoreContentAdaptWithSize(true)
+    uiImage_watermark:setVisible(false)
     local uiText_desc = ccui.Helper:seekWidgetByName(self.root,"Text_desc")
     uiText_desc:setString("")
-    local uiText_table = ccui.Helper:seekWidgetByName(self.root,"Text_table")
-    uiText_table:setString("")
+    -- local uiText_table = ccui.Helper:seekWidgetByName(self.root,"Text_table")
+    -- uiText_table:setString("")
     local uiText_time = ccui.Helper:seekWidgetByName(self.root,"Text_time")
     uiText_time:runAction(cc.RepeatForever:create(cc.Sequence:create(cc.CallFunc:create(function(sender,event) 
         local date = os.date("*t",os.time())
@@ -2057,45 +2058,45 @@ function TableLayer:initUI()
 
     local index = 1
     local hitCount = 0
-    -- local function onEventReset(sender, event)
-    --     if event == ccui.TouchEventType.ended then
-    --         Common:palyButton()
-    --         index = index + 1
-    --         if index > 3 then
-    --             index = 1
-    --         end
-    --         local wChairID = self:getChairIDByUserID(UserData.User.userID) or 0
-    --         local cbCardIndex = GameCommon.player[wChairID].cbCardIndex
-    --         local maxHanCardRow = GameCommon.player[wChairID].maxHanCardRow
-    --         local uiPanel_stacks = ccui.Helper:seekWidgetByName(self.root, "Panel_stacks")
+    local function onEventReset(sender, event)
+        if event == ccui.TouchEventType.ended then
+            Common:palyButton()
+            index = index + 1
+            if index > 3 then
+                index = 1
+            end
+            local wChairID = self:getChairIDByUserID(UserData.User.userID) or 0
+            local cbCardIndex = GameCommon.player[wChairID].cbCardIndex
+            local maxHanCardRow = GameCommon.player[wChairID].maxHanCardRow
+            local uiPanel_stacks = ccui.Helper:seekWidgetByName(self.root, "Panel_stacks")
 
-    --         local newStackInfo = GameLogic:sortHandCard(clone(cbCardIndex), maxHanCardRow, cc.p(uiPanel_stacks:getPosition()), index)
-    --         local isEquil = self:isHandCardAllEqual(GameCommon.player[wChairID].cardStackInfo, newStackInfo)
-    --         if isEquil then
-    --             hitCount = hitCount + 1
-    --             if hitCount > 2 then
-    --                 hitCount = 0
-    --                 return
-    --             end
-    --             onEventReset(nil, ccui.TouchEventType.ended)
-    --         else
-    --             hitCount = 0
-    --             GameCommon.player[wChairID].cardStackInfo = newStackInfo
-    --             if GameCommon.player[wChairID].cbCardCoutWW ~= nil then
-    --              local cbCardCoutWW = GameCommon.player[wChairID].cbCardCoutWW  
-    --              GameCommon.player[wChairID].cbCardCoutWW =  0 
-    --                 for i = 1 , cbCardCoutWW do
-    --                     self:addOneHandCard(wChairID, 33,cc.p(uiPanel_stacks:getPosition()),1)
-    --                 end
-    --             end
-    --             self:showHandCard(wChairID, 3)
-    --         end
-    --     end
-    -- end    
+            local newStackInfo = GameLogic:sortHandCard(clone(cbCardIndex), maxHanCardRow, cc.p(uiPanel_stacks:getPosition()), index)
+            local isEquil = self:isHandCardAllEqual(GameCommon.player[wChairID].cardStackInfo, newStackInfo)
+            if isEquil then
+                hitCount = hitCount + 1
+                if hitCount > 2 then
+                    hitCount = 0
+                    return
+                end
+                onEventReset(nil, ccui.TouchEventType.ended)
+            else
+                hitCount = 0
+                GameCommon.player[wChairID].cardStackInfo = newStackInfo
+                if GameCommon.player[wChairID].cbCardCoutWW ~= nil then
+                 local cbCardCoutWW = GameCommon.player[wChairID].cbCardCoutWW  
+                 GameCommon.player[wChairID].cbCardCoutWW =  0 
+                    for i = 1 , cbCardCoutWW do
+                        self:addOneHandCard(wChairID, 33,cc.p(uiPanel_stacks:getPosition()),1)
+                    end
+                end
+                self:showHandCard(wChairID, 3)
+            end
+        end
+    end    
     if Button_change ~= nil then
         Button_change:setPressedActionEnabled(true)
         Button_change:setVisible(false)
-    --    Button_change:addTouchEventListener(onEventReset)
+        Button_change:addTouchEventListener(onEventReset)
     end 
     
     
@@ -2187,9 +2188,9 @@ function TableLayer:updateGameState(state)
         local uiImage_timedown = ccui.Helper:seekWidgetByName(self.root,"Image_timedown")
         uiImage_timedown:setVisible(false)
         local Button_change = ccui.Helper:seekWidgetByName(self.root, "Button_change")
-        -- if Button_change ~= nil then
-        --     Button_change:setVisible(true)
-        -- end 
+        if Button_change ~= nil then
+            Button_change:setVisible(true)
+        end 
         
     elseif state == GameCommon.GameState_Over then
         UserData.Game:addGameStatistics(GameCommon.tableConfig.wKindID)

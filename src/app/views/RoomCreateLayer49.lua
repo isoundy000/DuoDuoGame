@@ -95,6 +95,20 @@ function RoomCreateLayer:onCreate(parameter)
             var:setEnabled(true)
             var:setColor(cc.c3b(255,255,255))
         end
+
+        local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(6),"ListView_parameter"):getItems()
+        if index == 2 then
+            items[2]:setEnabled(true)
+            items[2]:setColor(cc.c3b(255,255,255))  
+        else
+            items[2]:setBright(false)
+            items[2]:setEnabled(false)
+            items[2]:setColor(cc.c3b(170,170,170))
+            local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+            if uiText_desc ~= nil then 
+                uiText_desc:setTextColor(cc.c3b(109,58,44))
+            end
+        end
     end)
     if self.recordCreateParameter["bPlayerCount"] ~= nil and self.recordCreateParameter["bPlayerCount"] == 2 then
         items[2]:setBright(true)
@@ -272,13 +286,39 @@ function RoomCreateLayer:onCreate(parameter)
             uiText_desc:setTextColor(cc.c3b(238,105,40))
         end
     end
+
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(6),"ListView_parameter"):getItems()
+    Common:addCheckTouchEventListener(items,true) 
     if self.recordCreateParameter["bHuangFanAddUp"] == nil or self.recordCreateParameter["bHuangFanAddUp"] ~= 2 then
-        items[4]:setBright(true)
-	local uiText_desc = ccui.Helper:seekWidgetByName(items[4],"Text_desc")
+        items[1]:setBright(true)
+	local uiText_desc = ccui.Helper:seekWidgetByName(items[1],"Text_desc")
         if uiText_desc ~= nil then 
             uiText_desc:setTextColor(cc.c3b(238,105,40))
         end
     end
+
+    if self.recordCreateParameter["bPlayerCount"] == nil or self.recordCreateParameter["bPlayerCount"] ~= 2 then
+        items[2]:setBright(false)
+        items[2]:setEnabled(false)
+        items[2]:setColor(cc.c3b(170,170,170))
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(109,58,44))
+        end
+    elseif self.recordCreateParameter["bDeathCard"] ~= nil and self.recordCreateParameter["bDeathCard"] == 1 then
+        items[2]:setBright(true)
+        items[2]:setBright(true)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(238,105,40))
+        end
+    else
+        items[2]:setBright(false)
+        local uiText_desc = ccui.Helper:seekWidgetByName(items[2],"Text_desc")
+        if uiText_desc ~= nil then 
+            uiText_desc:setTextColor(cc.c3b(109,58,44))
+        end
+    end    
 
 
     if self.showType == 3 then
@@ -427,10 +467,18 @@ function RoomCreateLayer:onEventCreate(nTableType)
     if items[3]:isBright() then
         tableParameter.STWK = 1
     end
-    if items[4]:isBright() then
+
+    local items = ccui.Helper:seekWidgetByName(uiListView_parameterList:getItem(6),"ListView_parameter"):getItems()
+    if items[1]:isBright() then
         tableParameter.bHuangFanAddUp = 1
     else
         tableParameter.bHuangFanAddUp = 2
+    end
+
+    if items[2]:isBright() then
+        tableParameter.bDeathCard = 1
+    else
+        tableParameter.bDeathCard = 0
     end
 
 
@@ -448,7 +496,7 @@ function RoomCreateLayer:onEventCreate(nTableType)
     tableParameter.bSocreType = 1
 
 
-    tableParameter.bDeathCard = 0
+   -- tableParameter.bDeathCard = 0
     tableParameter.bStartBanker = 0
     
    if self.showType ~= 2 and (nTableType == TableType_FriendRoom or nTableType == TableType_HelpRoom) then

@@ -52,6 +52,7 @@ function NewClubPartnerLayer:onConfig()
         {"Text_dyj_total"},
         {"Text_cy_total"},
         {"Text_yb_total"},
+        {"Text_jf_total"},
         {"Image_memItem"},
         {"Panel_memTotal"},
         {"Image_totalFrame"},
@@ -79,9 +80,14 @@ function NewClubPartnerLayer:onConfig()
         {"Text_partnernum"},
         {"Text_partneryb"},
         {"Button_returnLast", "onPartnerReturn"},
+        {"Image_myPartner"},
+        {"Text_fanliTitle"},
+        {"Image_pushMyPartner"},
         {"ListView_myPartner"},
+        {"ListView_findMyPartner"},
         {"ListView_pushMyPartner"},
         {"Image_myPartnerItem"},
+        {"Image_myPartnerPushItem"},
         {"Panel_partnerTotal"},
         {"Image_partnerTotal"},
         {"Text_partner_rc"},
@@ -89,9 +95,19 @@ function NewClubPartnerLayer:onConfig()
         {"Text_partner_yb"},
         {"Text_partner_plz"},
         {"Text_partner_dyj"},
+        {"Text_partner_totalJf"},
         {"ListView_partnerTotal"},
         {"ListView_partnerPushTotal"},
         {"Image_partnerPushTotal"},
+        {"Image_partnerMemTotal"},
+        {"Text_partner_mem_fk"},
+        {"Text_partner_mem_plz"},
+        {"Text_partner_mem_yb"},
+        {"Text_partner_mem_dyj"},
+        {"Text_partner_mem_cy"},
+        {"ListView_partnerMemTotal"},
+        {"Image_partnerPushMemTotal"},
+        {"ListView_partnerPushDes"},
         {"Panel_partnerItem"},
         {"Panel_partnerPushItem"},
         {"Panel_addParnter"},
@@ -119,7 +135,6 @@ function NewClubPartnerLayer:onEnter()
     EventMgr:registListener(EventType.RET_GET_CLUB_PARTNER_MEMBER ,self,self.RET_GET_CLUB_PARTNER_MEMBER)
     EventMgr:registListener(EventType.RET_GET_CLUB_PARTNER_MEMBER_FINISH ,self,self.RET_GET_CLUB_PARTNER_MEMBER_FINISH)
     EventMgr:registListener(EventType.RET_FIND_CLUB_PARTNER_MEMBER ,self,self.RET_FIND_CLUB_PARTNER_MEMBER)
-    EventMgr:registListener(EventType.RET_ADD_CLUB_MEMBER,self,self.RET_ADD_CLUB_MEMBER)
     EventMgr:registListener(EventType.RET_REMOVE_CLUB_MEMBER,self,self.RET_REMOVE_CLUB_MEMBER)
     EventMgr:registListener(EventType.RET_CLUB_PLAYER_COUNT ,self,self.RET_CLUB_PLAYER_COUNT)
     EventMgr:registListener(EventType.RET_CLUB_PAGE_PLAYER_COUNT ,self,self.RET_CLUB_PAGE_PLAYER_COUNT)
@@ -138,6 +153,7 @@ function NewClubPartnerLayer:onEnter()
     EventMgr:registListener(EventType.RET_GET_CLUB_NOT_PARTNER_MEMBER ,self,self.RET_GET_CLUB_NOT_PARTNER_MEMBER)
     EventMgr:registListener(EventType.RET_GET_CLUB_NOT_PARTNER_MEMBER_FINISH ,self,self.RET_GET_CLUB_NOT_PARTNER_MEMBER_FINISH)
     EventMgr:registListener(EventType.RET_FIND_CLUB_NOT_PARTNER_MEMBER ,self,self.RET_FIND_CLUB_NOT_PARTNER_MEMBER)
+    EventMgr:registListener(EventType.RET_SETTINGS_CONFIG ,self,self.RET_SETTINGS_CONFIG)
 end
 
 function NewClubPartnerLayer:onExit()
@@ -147,7 +163,6 @@ function NewClubPartnerLayer:onExit()
     EventMgr:unregistListener(EventType.RET_GET_CLUB_PARTNER_MEMBER ,self,self.RET_GET_CLUB_PARTNER_MEMBER)
     EventMgr:unregistListener(EventType.RET_GET_CLUB_PARTNER_MEMBER_FINISH ,self,self.RET_GET_CLUB_PARTNER_MEMBER_FINISH)
     EventMgr:unregistListener(EventType.RET_FIND_CLUB_PARTNER_MEMBER ,self,self.RET_FIND_CLUB_PARTNER_MEMBER)
-    EventMgr:unregistListener(EventType.RET_ADD_CLUB_MEMBER,self,self.RET_ADD_CLUB_MEMBER)
     EventMgr:unregistListener(EventType.RET_REMOVE_CLUB_MEMBER,self,self.RET_REMOVE_CLUB_MEMBER)
     EventMgr:unregistListener(EventType.RET_CLUB_PLAYER_COUNT ,self,self.RET_CLUB_PLAYER_COUNT)
     EventMgr:unregistListener(EventType.RET_CLUB_PAGE_PLAYER_COUNT ,self,self.RET_CLUB_PAGE_PLAYER_COUNT)
@@ -166,11 +181,13 @@ function NewClubPartnerLayer:onExit()
     EventMgr:unregistListener(EventType.RET_GET_CLUB_NOT_PARTNER_MEMBER ,self,self.RET_GET_CLUB_NOT_PARTNER_MEMBER)
     EventMgr:unregistListener(EventType.RET_GET_CLUB_NOT_PARTNER_MEMBER_FINISH ,self,self.RET_GET_CLUB_NOT_PARTNER_MEMBER_FINISH)
     EventMgr:unregistListener(EventType.RET_FIND_CLUB_NOT_PARTNER_MEMBER ,self,self.RET_FIND_CLUB_NOT_PARTNER_MEMBER)
+    EventMgr:unregistListener(EventType.RET_SETTINGS_CONFIG ,self,self.RET_SETTINGS_CONFIG)
 end
 
 function NewClubPartnerLayer:onCreate(param)
 	self.clubData = param[1]
-	self:switchType(1)
+    local itype = param[2] or 1
+	self:switchType(itype)
 	self:updateInputStr()
 	self.ListView_mem:addScrollViewEventListener(handler(self, self.listViewMyPlayerEventListen))
 	self.ListView_playerCount:addScrollViewEventListener(handler(self, self.listViewPlayerCountEventListen))
@@ -191,7 +208,9 @@ function NewClubPartnerLayer:onCreate(param)
 
     if self:isAdmin(UserData.User.userID) then
         self.Button_earning:setVisible(false)
+        self.Button_addPartner:setPositionY(264)
     end
+    UserData.Guild:getPartnerConfig(UserData.User.userID, self.clubData.dwClubID)
 end
 
 function NewClubPartnerLayer:onClose()
@@ -227,14 +246,29 @@ function NewClubPartnerLayer:onFindMem()
         local dwUserID = tonumber(self.TextField_memId:getString())
         if dwUserID then
             local dwMinWinnerScore = 0
+            if not self.pCurID then
+                self.pCurID = UserData.User.userID
+                if self:isAdmin(UserData.User.userID) then
+                    self.pCurID = self.clubData.dwUserID
+                end
+            end
             UserData.Guild:findPartnerMember(self.clubData.dwClubID,self.pCurID,dwUserID,self.beganTime,self.endTime,dwMinWinnerScore)
+        else
+            require("common.MsgBoxLayer"):create(0,nil,"输入格式错误！")
+        end
+    elseif self.curPartnerPage == 4 then
+        local dwUserID = tonumber(self.TextField_memId:getString())
+        if dwUserID then
+            local dwMinWinnerScore = 0
+            self.pCurID = dwUserID
+            UserData.Guild:findPartnerMember(self.clubData.dwClubID,dwUserID,dwUserID,self.beganTime,self.endTime,dwMinWinnerScore)
         else
             require("common.MsgBoxLayer"):create(0,nil,"输入格式错误！")
         end
     elseif self.curPartnerPage == 6 then
 	    local dwUserID = tonumber(self.TextField_memId:getString())
 	    if dwUserID then
-	        UserData.Guild:findClubNotPartnerMember(self.clubData.dwClubID, dwUserID)
+	        UserData.Guild:findClubNotPartnerMember(self.clubData.dwClubID, UserData.User.userID, 1, dwUserID)
 	    else
 	    	require("common.MsgBoxLayer"):create(0,nil,"输入格式错误！")
 	    end
@@ -247,6 +281,11 @@ function NewClubPartnerLayer:onFindMemReturn()
 		self.ListView_memFind:setVisible(false)
 		self.Button_findMem:setVisible(true)
 		self.Button_findMemReturn:setVisible(false)
+    elseif self.curPartnerPage == 4 then
+        self.ListView_myPartner:setVisible(true)
+        self.ListView_findMyPartner:setVisible(false)
+        self.Button_findMem:setVisible(true)
+        self.Button_findMemReturn:setVisible(false)
 	elseif self.curPartnerPage == 6 then
 		self.ListView_addParnter:setVisible(true)
 		self.ListView_findAddParnter:setVisible(false)
@@ -265,23 +304,31 @@ function NewClubPartnerLayer:onPartnerPageReturn()
         self.Panel_partnerCount:setVisible(false)
 
     elseif self.curPartnerPage == 5 then
-    	self.Image_partnerTotal:setVisible(true)
-        self.Image_partnerPushTotal:setVisible(false)
-        self.Text_timeNode:setVisible(true)
-        self.Image_findNode:setVisible(false)
-        self.Panel_partnerCount:setVisible(false)
+        if self.Image_partnerPushTotal:isVisible() then
+            self.Image_partnerTotal:setVisible(true)
+            self.Image_partnerPushTotal:setVisible(false)
+            self.Text_timeNode:setVisible(true)
+            self.Image_findNode:setVisible(false)
+            self.Panel_partnerCount:setVisible(false)
+        elseif self.Image_partnerMemTotal:isVisible() then
+            self.Image_partnerMemTotal:setVisible(false)
+            self.Image_partnerPushTotal:setVisible(true)
+        elseif self.Image_partnerPushMemTotal:isVisible() then
+            self.Image_partnerPushMemTotal:setVisible(false)
+            self.Image_partnerMemTotal:setVisible(true)
+            Common:requestUserAvatar(self.curFindPartnerUser.dwUserID, self.curFindPartnerUser.szLogoInfo, self.Image_partnerPageHead, "img")
+            self.Text_partnerPageName:setString(self.curFindPartnerUser.szNickName)
+            self.Text_partnerPageID:setString('ID:' .. self.curFindPartnerUser.dwUserID)
+        end
+    	
     end
 end
 
 function NewClubPartnerLayer:onPartnerReturn()
 	self.Image_findNode:setVisible(false)
-	self.Button_returnLast:setVisible(false)
-	self.ListView_myPartner:setVisible(true)
-	self.ListView_pushMyPartner:setVisible(false)
-	self.Text_partnerdyj:setString('/')
-	self.Text_partnercy:setString('/')
-	self.Text_partnernum:setString('/')
-	self.Text_partneryb:setString('/')
+	self.Image_myPartner:setVisible(true)
+	self.Image_pushMyPartner:setVisible(false)
+    self.Image_findNode:setVisible(true)
 end
 
 function NewClubPartnerLayer:onImportClub()
@@ -353,7 +400,7 @@ function NewClubPartnerLayer:research()
         UserData.Guild:getPartnerAllEarnings(UserData.User.userID, self.clubData.dwClubID, self.beganTime, self.endTime)
 
     elseif self.curPartnerPage == 4 then
-    	if self.ListView_myPartner:isVisible() then
+    	if self.Image_myPartner:isVisible() then
             --我的合伙人 
             self.ListView_myPartner:removeAllItems()
             self.partnerReqState = 0
@@ -501,16 +548,16 @@ function NewClubPartnerLayer:switchType(itype)
 		self.Panel_addParnter:setVisible(false)
 		self.Panel_partnerTotal:setVisible(false)
 		self.Text_timeNode:setVisible(true)
-		if self.ListView_pushMyPartner:isVisible() then
+		if self.Image_pushMyPartner:isVisible() then
 			self.Image_findNode:setVisible(false)
 		else
-			self.Image_findNode:setVisible(false)
-			self.Button_returnLast:setVisible(false)
-			self.Text_partnerdyj:setString('/')
-			self.Text_partnercy:setString('/')
-			self.Text_partnernum:setString('/')
-			self.Text_partneryb:setString('/')
+			self.Image_findNode:setVisible(true)
 		end
+        if self.bDistributionModel ~= 2 then
+            self.Text_fanliTitle:setVisible(false)
+        else
+            self.Text_fanliTitle:setVisible(true)
+        end
 
 	elseif itype == 5 then
 		self.Button_mem:setBright(true)
@@ -526,7 +573,7 @@ function NewClubPartnerLayer:switchType(itype)
 		self.Panel_partnerTotal:setVisible(true)
 		self.Panel_addParnter:setVisible(false)
 
-		if not self.Image_partnerPushTotal:isVisible() then
+		if self.Image_partnerTotal:isVisible() then
 			self.Text_timeNode:setVisible(true)
 			self.Image_findNode:setVisible(false)
 			self.Panel_partnerCount:setVisible(false)
@@ -685,67 +732,37 @@ function NewClubPartnerLayer:setStopPlayState(item, isProhibit, cbOnlineStatus)
     end
 end
 
-function NewClubPartnerLayer:insertMyPartnerItme(data, listView)
+function NewClubPartnerLayer:insertMyPartnerItme(data)
 	local item = self.Image_myPartnerItem:clone()
-    if listView then
-    	listView = listView
+    if self.ListView_findMyPartner:isVisible() then
+        if self.pCurID == data.dwUserID then
+            self.ListView_findMyPartner:removeAllItems()
+            self.ListView_findMyPartner:pushBackCustomItem(item)
+        end
     else
-    	listView = self.ListView_myPartner
+        self.ListView_myPartner:pushBackCustomItem(item)
     end
-    listView:pushBackCustomItem(item)
     item:setName('MyPartner_' .. data.dwUserID)
     local Image_head = ccui.Helper:seekWidgetByName(item, "Image_head")
     local Text_state = ccui.Helper:seekWidgetByName(item, "Text_state")
     local Text_name = ccui.Helper:seekWidgetByName(item, "Text_name")
     local Text_id = ccui.Helper:seekWidgetByName(item, "Text_id")
-    local Text_dyjNum = ccui.Helper:seekWidgetByName(item, "Text_dyjNum")
-    local Text_cyNum = ccui.Helper:seekWidgetByName(item, "Text_cyNum")
-    local Text_playerNum = ccui.Helper:seekWidgetByName(item, "Text_playerNum")
-    local Text_ybNum = ccui.Helper:seekWidgetByName(item, "Text_ybNum")
+    local Text_sf = ccui.Helper:seekWidgetByName(item, "Text_sf")
+    local Text_fl = ccui.Helper:seekWidgetByName(item, "Text_fl")
     local Button_des = ccui.Helper:seekWidgetByName(item, "Button_des")
     local Button_remove = ccui.Helper:seekWidgetByName(item, "Button_remove")
-    local Button_pushCtr = ccui.Helper:seekWidgetByName(item, "Button_pushCtr")
+    local Button_set = ccui.Helper:seekWidgetByName(item, "Button_set")
     Text_name:setColor(cc.c3b(131, 88, 45))
     Text_id:setColor(cc.c3b(131, 88, 45))
-    Text_dyjNum:setColor(cc.c3b(131, 88, 45))
-    Text_cyNum:setColor(cc.c3b(131, 88, 45))
-    Text_ybNum:setColor(cc.c3b(131, 88, 45))
-    Text_playerNum:setColor(cc.c3b(131, 88, 45))
+    Text_sf:setColor(cc.c3b(131, 88, 45))
+    Text_fl:setColor(cc.c3b(131, 88, 45))
 
-    if self.ListView_pushMyPartner:isVisible() then
-    	Button_pushCtr:setVisible(true)
-    	Button_des:setVisible(false)
-    	Button_remove:setVisible(false)
-    	if data.dwUserID == self.pCurID then
-    		if self.clubData.dwUserID == UserData.User.userID or self:isAdmin(UserData.User.userID) then
-    			local path = 'kwxclub/club_partner_6.png'
-    			Button_pushCtr:loadTextures(path, path, path)
-    			Common:addTouchEventListener(Button_pushCtr, function()
-			   		--调配成员
-                    local leaderId = nil
-                    if self:isAdmin(UserData.User.userID) then
-                        leaderId = self.clubData.dwUserID
-                    end
-			   		local node = require("app.MyApp"):create(data, leaderId):createView("NewClubAllocationLayer")
-        			self:addChild(node)
-	    		end)
-    		else
-    			Button_pushCtr:setVisible(false)
-    		end
-    	else
-    		local path = 'kwxclub/club_partner_9.png'
-    		Button_pushCtr:loadTextures(path, path, path)
-    		Common:addTouchEventListener(Button_pushCtr, function()
-		   		--解绑成员
-		   		require("common.MsgBoxLayer"):create(1,nil,"您确定要解绑成员？",function() 
-		            UserData.Guild:reqSettingsClubMember(10, data.dwClubID, data.dwUserID, data.dwPartnerID,"")
-		        end)
-		    end)
-    	end
+    if self.bDistributionModel ~= 2 then
+        Text_fl:setVisible(false)
+        Button_set:setVisible(false)
     else
-    	Button_pushCtr:setVisible(false)
-    	Button_des:setVisible(true)
-    	Button_remove:setVisible(true)
+        Text_fl:setVisible(true)
+        Button_set:setVisible(true)
     end
 
     if data.isProhibit then
@@ -767,16 +784,17 @@ function NewClubPartnerLayer:insertMyPartnerItme(data, listView)
     Common:requestUserAvatar(data.dwUserID, data.szLogoInfo, Image_head, "img")
     Text_name:setString(data.szNickName)
     Text_id:setString(data.dwUserID)
-    Text_dyjNum:setString(data.dwWinnerCount or 0)
-    Text_cyNum:setString(data.dwGameCount or 0)
-    Text_ybNum:setString(data.lYuanBaoCount or 0)
-    Text_playerNum:setString(data.dwPlayerCount or 0)
+    Text_sf:setString(data.dwPartnerLevel .. '级合伙人')
+    Text_fl:setString(data.dwDistributionRatio .. '%')
+
+    Common:addTouchEventListener(Button_set, function()
+        self:addChild(require("app.MyApp"):create(data, self.userSelfPartnerData):createView("NewClubSetPercentLayer"))
+    end)
 
     Common:addTouchEventListener(Button_des, function()
     	self.Image_findNode:setVisible(false)
-		self.Button_returnLast:setVisible(true)
-		self.ListView_myPartner:setVisible(false)
-		self.ListView_pushMyPartner:setVisible(true)
+		self.Image_myPartner:setVisible(false)
+		self.Image_pushMyPartner:setVisible(true)
 		self.ListView_pushMyPartner:removeAllItems()
     	self.pCurID = data.dwUserID
         self.partnerReqState = 0
@@ -788,6 +806,78 @@ function NewClubPartnerLayer:insertMyPartnerItme(data, listView)
             UserData.Guild:reqSettingsClubMember(4, data.dwClubID, data.dwUserID,0,"")
         end)
     end)
+end
+
+function NewClubPartnerLayer:insertMyPushPartnerItme(data)
+    local item = self.Image_myPartnerPushItem:clone()
+    self.ListView_pushMyPartner:pushBackCustomItem(item)
+    item:setName('MyPushPartner_' .. data.dwUserID)
+    local Image_head = ccui.Helper:seekWidgetByName(item, "Image_head")
+    local Text_state = ccui.Helper:seekWidgetByName(item, "Text_state")
+    local Text_id = ccui.Helper:seekWidgetByName(item, "Text_id")
+    local Text_name = ccui.Helper:seekWidgetByName(item, "Text_name")
+    local Text_dyjNum = ccui.Helper:seekWidgetByName(item, "Text_dyjNum")
+    local Text_cyNum = ccui.Helper:seekWidgetByName(item, "Text_cyNum")
+    local Text_playerNum = ccui.Helper:seekWidgetByName(item, "Text_playerNum")
+    local Text_ybNum = ccui.Helper:seekWidgetByName(item, "Text_ybNum")
+    local Button_pushCtr = ccui.Helper:seekWidgetByName(item, "Button_pushCtr")
+    Text_name:setColor(cc.c3b(131, 88, 45))
+    Text_id:setColor(cc.c3b(131, 88, 45))
+    Text_dyjNum:setColor(cc.c3b(131, 88, 45))
+    Text_cyNum:setColor(cc.c3b(131, 88, 45))
+    Text_playerNum:setColor(cc.c3b(131, 88, 45))
+    Text_ybNum:setColor(cc.c3b(131, 88, 45))
+
+    if data.dwUserID == self.pCurID then
+        if self.clubData.dwUserID == UserData.User.userID or self:isAdmin(UserData.User.userID) then
+            local path = 'kwxclub/club_partner_6.png'
+            Button_pushCtr:loadTextures(path, path, path)
+            Common:addTouchEventListener(Button_pushCtr, function()
+                --调配成员
+                local leaderId = nil
+                if self:isAdmin(UserData.User.userID) then
+                    leaderId = self.clubData.dwUserID
+                end
+                local node = require("app.MyApp"):create(data, leaderId):createView("NewClubAllocationLayer")
+                self:addChild(node)
+            end)
+        else
+            Button_pushCtr:setVisible(false)
+        end
+    else
+        local path = 'kwxclub/club_partner_9.png'
+        Button_pushCtr:loadTextures(path, path, path)
+        Common:addTouchEventListener(Button_pushCtr, function()
+            --解绑成员
+            require("common.MsgBoxLayer"):create(1,nil,"您确定要解绑成员？",function() 
+                UserData.Guild:reqSettingsClubMember(10, data.dwClubID, data.dwUserID, data.dwPartnerID,"")
+            end)
+        end)
+    end
+    
+    if data.isProhibit then
+        Text_state:setColor(cc.c3b(255, 0, 0))
+        Text_state:setString('暂停娱乐')
+    elseif data.cbOnlineStatus == 1 then
+        Text_state:setColor(cc.c3b(0, 128, 0))
+        Text_state:setString('在线')
+    elseif data.cbOnlineStatus == 2 or data.cbOnlineStatus == 0 then
+        Text_state:setColor(cc.c3b(177, 177, 177))
+        Text_state:setString('离线')
+    elseif data.cbOnlineStatus == 100 then
+        Text_state:setColor(cc.c3b(243, 130, 16))
+        Text_state:setString('对局中')
+    else
+        Text_state:setVisible(false)
+    end
+
+    Common:requestUserAvatar(data.dwUserID, data.szLogoInfo, Image_head, "img")
+    Text_name:setString(data.szNickName)
+    Text_id:setString(data.dwUserID)
+    Text_dyjNum:setString(data.dwWinnerCount or 0)
+    Text_cyNum:setString(data.dwGameCount or 0)
+    Text_ybNum:setString(data.lYuanBaoCount or 0)
+    Text_playerNum:setString(data.dwPlayerCount or 0)
 end
 
 function NewClubPartnerLayer:isAdmin(userid)
@@ -905,21 +995,57 @@ function NewClubPartnerLayer:RET_GET_CLUB_PARTNER(event)
         return
     end
 
+    if self.isFirstEnter then
+        self.isFirstEnter = false
+        self.userSelfPartnerData = data
+
+        if self.bDistributionModel == 0 then
+            if self.clubData.dwUserID == UserData.User.userID or self:isAdmin(UserData.User.userID) then
+                self.Button_addPartner:setVisible(true)
+            else
+                self.Button_addPartner:setVisible(false)
+            end
+        elseif self.bDistributionModel == 1 then
+            self.Button_addPartner:setVisible(true)
+        else
+            if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+                if data.dwPartnerLevel >= 3 then
+                    self.Button_addPartner:setVisible(false)
+                else
+                    self.Button_addPartner:setVisible(true)
+                end
+            else
+                if data.dwPartnerLevel >= 5 then
+                    self.Button_addPartner:setVisible(false)
+                else
+                    self.Button_addPartner:setVisible(true)
+                end
+            end
+        end
+        return
+    end
+
     if self.curPartnerPage == 1 then
     	--玩家列表
         -- self:insertOncePartnerMember(data)
+        self.userSelfPartnerData = data
         self.Text_dyj_total:setString(data.dwWinnerCount)
         self.Text_cy_total:setString(data.dwGameCount)
         self.Text_yb_total:setString(data.lYuanBaoCount)
+        self.Text_jf_total:setString(data.lScore)
         self.pCurPage = 1
         self.pReqState = 0
         self:reqClubPartnerMember()
     elseif self.curPartnerPage == 4 then
     	--我的合伙人
-    	if self.ListView_myPartner:isVisible() then
+    	if self.Image_myPartner:isVisible() then
     		if data.dwUserID ~= UserData.User.userID and self.clubData.dwUserID ~= data.dwUserID then
 	    		self:insertMyPartnerItme(data)
 	    	end
+
+            if data.dwUserID == UserData.User.userID or self.clubData.dwUserID == data.dwUserID then
+                self.userSelfPartnerData = data
+            end
 	    else
 	    	-- 我的合伙人展开
 			self.Text_partnerdyj:setString(data.dwWinnerCount)
@@ -950,7 +1076,7 @@ function NewClubPartnerLayer:RET_GET_CLUB_PARTNER_MEMBER(event)
     if self.curPartnerPage == 1 then
         self:insertOncePartnerMember(data)
     elseif self.curPartnerPage == 4 then
-    	self:insertMyPartnerItme(data, self.ListView_pushMyPartner)
+    	self:insertMyPushPartnerItme(data)
     end
 end
 
@@ -979,30 +1105,13 @@ function NewClubPartnerLayer:RET_FIND_CLUB_PARTNER_MEMBER(event)
 		self.Button_findMemReturn:setVisible(true)
 		self.ListView_memFind:removeAllItems()
         self:insertOncePartnerMember(data, self.ListView_memFind)
+    elseif self.curPartnerPage == 4 then
+        self.ListView_myPartner:setVisible(false)
+        self.ListView_findMyPartner:setVisible(true)
+        self.Button_findMem:setVisible(false)
+        self.Button_findMemReturn:setVisible(true)
+        self:insertMyPartnerItme(data)
     end
-end
-
---返回添加亲友圈成员
-function NewClubPartnerLayer:RET_ADD_CLUB_MEMBER(event)
-    local data = event._usedata
-    dump(data)
-    if data.lRet ~= 0 then
-        if data.lRet == 1 then
-            require("common.MsgBoxLayer"):create(0,self,"ID输入错误!")
-        elseif data.lRet == 2 then
-            require("common.MsgBoxLayer"):create(0,self,"该成员已在亲友圈内，请勿重复操作!")
-        elseif data.lRet == 3 then
-            require("common.MsgBoxLayer"):create(0,self,"玩家ID不合法!")
-        elseif data.lRet == 4 then
-            require("common.MsgBoxLayer"):create(0,self,"您没有权限导入！")
-        elseif data.lRet == 5 then
-            require("common.MsgBoxLayer"):create(0,self,"人数已满!")
-        else
-            require("common.MsgBoxLayer"):create(0,self,"请升级游戏版本!")
-        end
-        return
-    end
-    require("common.MsgBoxLayer"):create(0,self,"导入成功!")
 end
 
 --返回剔除成员
@@ -1051,23 +1160,40 @@ function NewClubPartnerLayer:RET_CLUB_PLAYER_COUNT(event)
         require("common.MsgBoxLayer"):create(0,nil,"获取我的玩家统计失败！")
         return
     end
-    self.Text_wj_alljt:setString(data.dwTargetFatigueTip)
-    self.Text_wj_allFatiguesy:setString(data.dwTargetFatigueIncome)
-    self.Text_wj_allYuanBaosy:setString(data.dwTargetYuanBaoIncome)
-    self.Text_wj_alldyj:setString(data.dwBigWinnerTime)
-    self.Text_wj_cynum:setString(data.dwPeopleCount)
-    self.playerCountPage = 1
-    UserData.Guild:getClubPagePlayerCount(self.clubData.dwClubID, UserData.User.userID, self.beganTime, self.endTime, self.playerCountPage)
+
+    if self.curPartnerPage == 2 then
+        self.Text_wj_alljt:setString(data.dwTargetFatigueTip)
+        self.Text_wj_allFatiguesy:setString(data.dwTargetFatigueIncome)
+        self.Text_wj_allYuanBaosy:setString(data.dwTargetYuanBaoIncome)
+        self.Text_wj_alldyj:setString(data.dwBigWinnerTime)
+        self.Text_wj_cynum:setString(data.dwPeopleCount)
+        self.playerCountPage = 1
+        UserData.Guild:getClubPagePlayerCount(self.clubData.dwClubID, UserData.User.userID, self.beganTime, self.endTime, self.playerCountPage)
+
+    elseif self.curPartnerPage == 5 then
+        self.Text_partner_mem_fk:setString(data.dwTargetFatigueTip)
+        self.Text_partner_mem_plz:setString(data.dwTargetFatigueIncome)
+        self.Text_partner_mem_yb:setString(data.dwTargetYuanBaoIncome)
+        self.Text_partner_mem_dyj:setString(data.dwBigWinnerTime)
+        self.Text_partner_mem_cy:setString(data.dwPeopleCount)
+        self.playerCountPage = 1
+        UserData.Guild:getClubPagePlayerCount(self.clubData.dwClubID, self.curFindPartnerUser.dwUserID, self.partnerBeganTime, self.partnerEndTime, self.playerCountPage)
+    end
 end
 
 function NewClubPartnerLayer:RET_CLUB_PAGE_PLAYER_COUNT(event)
     local data = event._usedata
     dump(data)
+    local listView = self.ListView_playerCount
+    if self.curPartnerPage == 5 then
+        listView = self.ListView_partnerMemTotal
+    end
+
     local item = self.Panel_totalItem:clone()
     if data.dwUserID == UserData.User.userID then
-        self.ListView_playerCount:insertCustomItem(item, 0)
+        listView:insertCustomItem(item, 0)
     else
-        self.ListView_playerCount:pushBackCustomItem(item)
+        listView:pushBackCustomItem(item)
     end
     local Image_head = self:seekWidgetByNameEx(item, "Image_head")
     local Text_name = self:seekWidgetByNameEx(item, "Text_name")
@@ -1093,19 +1219,33 @@ function NewClubPartnerLayer:RET_CLUB_PAGE_PLAYER_COUNT(event)
     Text_playcount:setString(data.dwPeopleCount)
 
     Common:addTouchEventListener(Button_push,function()
-        self.Image_totalFrame:setVisible(false)
-        self.Image_memPushFrame:setVisible(true)
-        self.Text_timeNode:setVisible(false)
-        self.Image_findNode:setVisible(false)
-        self.Panel_partnerCount:setVisible(true)
-        Common:requestUserAvatar(data.dwUserID, data.szLogoInfo, self.Image_partnerPageHead, "img")
-        self.Text_partnerPageName:setString(data.szNickName)
-        self.Text_partnerPageID:setString('ID:' .. data.dwUserID)
+        if self.curPartnerPage == 2 then
+            self.Image_totalFrame:setVisible(false)
+            self.Image_memPushFrame:setVisible(true)
+            self.Text_timeNode:setVisible(false)
+            self.Image_findNode:setVisible(false)
+            self.Panel_partnerCount:setVisible(true)
+            Common:requestUserAvatar(data.dwUserID, data.szLogoInfo, self.Image_partnerPageHead, "img")
+            self.Text_partnerPageName:setString(data.szNickName)
+            self.Text_partnerPageID:setString('ID:' .. data.dwUserID)
 
-        self.ListView_pushPlayerCount:removeAllItems()
-        self.curSelLookDetailsPlayer = data.dwUserID
-        self.playerCountDetailsPage = 1
-        UserData.Guild:getClubPlayerCountDetails(self.clubData.dwClubID, UserData.User.userID, data.dwUserID, self.beganTime, self.endTime, self.playerCountDetailsPage)
+            self.ListView_pushPlayerCount:removeAllItems()
+            self.curSelLookDetailsPlayer = data.dwUserID
+            self.playerCountDetailsPage = 1
+            UserData.Guild:getClubPlayerCountDetails(self.clubData.dwClubID, UserData.User.userID, data.dwUserID, self.beganTime, self.endTime, self.playerCountDetailsPage)
+        else
+            self.Image_partnerMemTotal:setVisible(false)
+            self.Image_partnerPushMemTotal:setVisible(true)
+            Common:requestUserAvatar(data.dwUserID, data.szLogoInfo, self.Image_partnerPageHead, "img")
+            self.Text_partnerPageName:setString(data.szNickName)
+            self.Text_partnerPageID:setString('ID:' .. data.dwUserID)
+
+            self.ListView_partnerPushDes:removeAllItems()
+            self.curSelLookDetailsPlayer = data.dwUserID
+            self.playerCountDetailsPage = 1
+
+            UserData.Guild:getClubPlayerCountDetails(self.clubData.dwClubID, self.curFindPartnerUser.dwUserID, data.dwUserID, self.partnerBeganTime, self.partnerEndTime, self.playerCountDetailsPage)
+        end
     end)
 end
 
@@ -1125,9 +1265,13 @@ function NewClubPartnerLayer:RET_CLUB_PLAYER_COUNT_DETAILS(event)
     local data = event._usedata
     dump(data)
 
-    local item = self.Panel_totalPushItem:clone()
-    self.ListView_pushPlayerCount:pushBackCustomItem(item)
+    local listView = self.ListView_pushPlayerCount
+    if self.curPartnerPage == 5 then
+        listView = self.ListView_partnerPushDes
+    end
 
+    local item = self.Panel_totalPushItem:clone()
+    listView:pushBackCustomItem(item)
     local Text_room = self:seekWidgetByNameEx(item, "Text_room")
     local Text_playName = self:seekWidgetByNameEx(item, "Text_playName")
     local Text_juntan = self:seekWidgetByNameEx(item, "Text_juntan")
@@ -1262,9 +1406,11 @@ function NewClubPartnerLayer:RET_SETTINGS_CLUB_MEMBER(event)
         elseif data.lRet == 5 then
             require("common.MsgBoxLayer"):create(0,nil,"您的权限不足!")
         elseif data.lRet == 100 then
-            require("common.MsgBoxLayer"):create(0,nil,"对局中不能修改疲劳值")
+            require("common.MsgBoxLayer"):create(0,nil,"对局中不能减少疲劳值")
+        elseif data.lRet == 12 then
+            require("common.MsgBoxLayer"):create(0,nil,"超层级上限不能设置合伙人!")
         else
-            require("common.MsgBoxLayer"):create(0,nil,"设置错误!")
+            require("common.MsgBoxLayer"):create(0,nil,"设置错误! lRet=" .. data.lRet)
         end
         return
     end
@@ -1288,15 +1434,23 @@ function NewClubPartnerLayer:RET_SETTINGS_CLUB_MEMBER(event)
         if item then
             item:removeFromParent()
             require("common.MsgBoxLayer"):create(0,nil,"解除合伙人成功!")
+            self:research()
+        end
+
+        local item = self.ListView_findMyPartner:getChildByName('MyPartner_' .. data.dwUserID)
+        if item then
+            item:removeFromParent()
+            require("common.MsgBoxLayer"):create(0,nil,"解除合伙人成功!")
+            self:research()
         end
 
     elseif data.cbSettingsType == 5 then
         --调配成员
-        self:insertMyPartnerItme(data, self.ListView_pushMyPartner)
+        self:insertMyPushPartnerItme(data)
 
     elseif data.cbSettingsType == 10 then
         --解绑
-        local item = self.ListView_pushMyPartner:getChildByName('MyPartner_' .. data.dwUserID)
+        local item = self.ListView_pushMyPartner:getChildByName('MyPushPartner_' .. data.dwUserID)
         if item then
             item:removeFromParent()
             require("common.MsgBoxLayer"):create(0,nil,"解绑成员成功!")
@@ -1317,6 +1471,7 @@ function NewClubPartnerLayer:RET_CLUB_PARTNER_COUNT(event)
     self.Text_partner_yb:setString(data.dwTargetYuanBaoIncome)
     self.Text_partner_plz:setString(data.dwTargetFatigueIncome)
     self.Text_partner_dyj:setString(data.dwBigWinnerTime)
+    self.Text_partner_totalJf:setString(data.lTotalScoreTotal)
     self.partnerCountPage = 1
     if self.clubData.dwUserID == UserData.User.userID or self:isAdmin(UserData.User.userID) then
         UserData.Guild:getClubPagePartnerCount(self.clubData.dwClubID, 0, self.beganTime, self.endTime, 1)
@@ -1343,6 +1498,7 @@ function NewClubPartnerLayer:RET_CLUB_PAGE_PARTNER_COUNT(event)
     local Text_yuanbao = self:seekWidgetByNameEx(item, "Text_yuanbao")
     local Text_fagute = self:seekWidgetByNameEx(item, "Text_fagute")
     local Text_dyj = self:seekWidgetByNameEx(item, "Text_dyj")
+    local Text_sorce = self:seekWidgetByNameEx(item, "Text_sorce")
     local Button_push = self:seekWidgetByNameEx(item, "Button_push")
     Text_name:setColor(cc.c3b(131, 88, 45))
     Text_renci:setColor(cc.c3b(131, 88, 45))
@@ -1350,6 +1506,7 @@ function NewClubPartnerLayer:RET_CLUB_PAGE_PARTNER_COUNT(event)
     Text_yuanbao:setColor(cc.c3b(131, 88, 45))
     Text_fagute:setColor(cc.c3b(131, 88, 45))
     Text_dyj:setColor(cc.c3b(131, 88, 45))
+    Text_sorce:setColor(cc.c3b(131, 88, 45))
 
     Common:requestUserAvatar(data.dwUserID, data.szLogoInfo, Image_head, "img")
     Text_name:setString(data.szNickName)
@@ -1358,6 +1515,7 @@ function NewClubPartnerLayer:RET_CLUB_PAGE_PARTNER_COUNT(event)
     Text_yuanbao:setString(data.dwTargetYuanBaoIncome)
     Text_dyj:setString(data.dwBigWinnerTime)
     Text_renci:setString(data.dwPeopleCount)
+    Text_sorce:setString(data.lTotalScoreTotal)
 
     Common:addTouchEventListener(Button_push,function()
         self.Image_partnerTotal:setVisible(false)
@@ -1372,11 +1530,14 @@ function NewClubPartnerLayer:RET_CLUB_PAGE_PARTNER_COUNT(event)
         self.ListView_partnerPushTotal:removeAllItems()
         self.curSelLookDetailsPartner = data.dwUserID
         self.partnerCountDetailsPage = 1
+        self.partnerCountDetailsState = 0
         if self.clubData.dwUserID == UserData.User.userID or self:isAdmin(UserData.User.userID) then
             UserData.Guild:getClubPartnerCountDetails(self.clubData.dwClubID, data.dwUserID, 0, self.beganTime, self.endTime, 1)
         else
             UserData.Guild:getClubPartnerCountDetails(self.clubData.dwClubID, UserData.User.userID, data.dwUserID, self.beganTime, self.endTime, 1)
         end
+
+        self.curFindPartnerUser = data
     end)
 end
 
@@ -1404,6 +1565,7 @@ function NewClubPartnerLayer:RET_CLUB_PARTNER_COUNT_DETAILS(event)
     local Text_roomnum = self:seekWidgetByNameEx(item, "Text_roomnum")
     local Text_fitigue = self:seekWidgetByNameEx(item, "Text_fitigue")
     local Text_yuanbao = self:seekWidgetByNameEx(item, "Text_yuanbao")
+    local Button_push = self:seekWidgetByNameEx(item, "Button_push")
     Text_time:setColor(cc.c3b(131, 88, 45))
     Text_renci:setColor(cc.c3b(131, 88, 45))
     Text_roomnum:setColor(cc.c3b(131, 88, 45))
@@ -1414,6 +1576,16 @@ function NewClubPartnerLayer:RET_CLUB_PARTNER_COUNT_DETAILS(event)
     Text_yuanbao:setString(data.dwYuanBaoIncome)
     Text_roomnum:setString(data.dwFatigueTip)
     Text_fitigue:setString(data.dwFatigueIncome)
+
+    Common:addTouchEventListener(Button_push,function()
+        self.Image_partnerPushTotal:setVisible(false)
+        self.Image_partnerMemTotal:setVisible(true)
+        self.ListView_partnerMemTotal:removeAllItems()
+        local year,month,day = Common:getYMDHMS(data.dwCreateDate)
+        self.partnerBeganTime = os.time({year=year, month=month, day=day,hour=0, min=0, sec=0})
+        self.partnerEndTime = os.time({year=year, month=month, day=day,hour=23, min=59, sec=59})
+        UserData.Guild:getClubAllPlayerCount(data.dwUserID, data.dwClubID, self.partnerBeganTime, self.partnerEndTime)
+    end)
 end
 
 function NewClubPartnerLayer:RET_CLUB_PARTNER_COUNT_DETAILS_FINISH(event)
@@ -1487,7 +1659,7 @@ end
 function NewClubPartnerLayer:RET_FIND_CLUB_NOT_PARTNER_MEMBER(event)
     local data = event._usedata
     dump(data)
-    if data.lRet == 0 then
+    if data.dwUserID ~= 0 then
         self.ListView_addParnter:setVisible(false)
         self.ListView_findAddParnter:setVisible(true)
         self.Button_findMem:setVisible(false)
@@ -1500,6 +1672,23 @@ function NewClubPartnerLayer:RET_FIND_CLUB_NOT_PARTNER_MEMBER(event)
     else
         require("common.MsgBoxLayer"):create(0,nil,"玩家ID不存在!")
     end
+end
+
+-- 合伙人设置配置
+function NewClubPartnerLayer:RET_SETTINGS_CONFIG(event)
+    local data = event._usedata
+    dump(data)
+    if data.lRet ~= 0 then
+        require("common.MsgBoxLayer"):create(0,nil,"获取亲友圈模式类型失败!")
+        return 
+    end
+    self.bDistributionModel = data.bDistributionModel
+    self.isFirstEnter = true
+    local userId = UserData.User.userID
+    if self:isAdmin(UserData.User.userID) then
+        userId = self.clubData.dwUserID
+    end
+    self:reqClubPartner(userId)
 end
 
 return NewClubPartnerLayer
