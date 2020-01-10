@@ -382,6 +382,8 @@ function TableLayer:doAction(action,pBuffer)
     elseif action == NetMsgId.SUB_S_ACTION_BAOTINGCARD then     -- 土匪麻将独有的消息
        
     elseif action == NetMsgId.SUB_S_OPERATE_RESULT then
+        GameCommon.IsOfHu = 0
+        GameCommon.iNOoutcard = false
         GameCommon.waitOutCardUser = pBuffer.wOperateUser               
         local uiPanel_operation = ccui.Helper:seekWidgetByName(self.root,"Panel_operation")
         uiPanel_operation:removeAllChildren()
@@ -2061,8 +2063,8 @@ function TableLayer:initUI()
     uiImage_watermark:setVisible(false)
     local uiText_desc = ccui.Helper:seekWidgetByName(self.root,"Text_desc")
     uiText_desc:setString("")
-    -- local uiText_table = ccui.Helper:seekWidgetByName(self.root,"Text_table")
-    -- uiText_table:setString("")
+    local uiText_table = ccui.Helper:seekWidgetByName(self.root,"Text_table")
+    uiText_table:setString("")
     local uiText_time = ccui.Helper:seekWidgetByName(self.root,"Text_time")
     uiText_time:runAction(cc.RepeatForever:create(cc.Sequence:create(cc.CallFunc:create(function(sender,event) 
         local date = os.date("*t",os.time())

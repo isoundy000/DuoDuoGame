@@ -364,7 +364,22 @@ function TableLayer:showCountDown(wChairID,isHide)
     Panel_countdown:setVisible(true)
 
     uiAtlasLabel_countdownTime:stopAllActions()
-    uiAtlasLabel_countdownTime:setString(15)
+    local time = 15
+
+    if GameCommon.tableConfig.nTableType > TableType_GoldRoom and GameCommon.bHosted ~= nil then
+        -- if GameCommon.bHosted[wChairID] == false  then  
+            if GameCommon.gameConfig.bHostedTime ~= 0 then 
+                time = 60*GameCommon.gameConfig.bHostedTime
+            else
+                time = 15
+            end 
+        -- else
+        --     time = 3
+        -- end 
+    end 
+
+
+    uiAtlasLabel_countdownTime:setString(time)
     local function onEventTime(sender,event)
         local currentTime = tonumber(uiAtlasLabel_countdownTime:getString())
         currentTime = currentTime - 1
@@ -531,6 +546,8 @@ function TableLayer:initUI()
     uiImage_watermark:setVisible(false)
     local uiText_desc = ccui.Helper:seekWidgetByName(self.root,"Text_desc")
     uiText_desc:setString("")
+    local uiText_table = ccui.Helper:seekWidgetByName(self.root,"Text_table")
+    uiText_table:setString("")
     local uiText_time = ccui.Helper:seekWidgetByName(self.root,"Text_time")
     uiText_time:runAction(cc.RepeatForever:create(cc.Sequence:create(cc.CallFunc:create(function(sender,event) 
         local date = os.date("*t",os.time())
@@ -800,6 +817,15 @@ function TableLayer:initUI()
             require("common.SceneMgr"):switchScene(require("app.MyApp"):create():createView("HallLayer"),SCENE_HALL) 
         end)
     end)
+
+    --取消托管
+    local uiButton_TG = ccui.Helper:seekWidgetByName(self.root,"Button_TG")
+    if uiButton_TG ~= nil then 
+        Common:addTouchEventListener(uiButton_TG,function() 
+            NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_USER_HOSTED,"o",false)
+        end)
+    end
+
     --结算层
     local uiPanel_end = ccui.Helper:seekWidgetByName(self.root,"Panel_end")
     uiPanel_end:setVisible(false)
@@ -1262,10 +1288,10 @@ function TableLayer:showPlayerPosition()   -- 显示玩家距离
     end
 end
 
-function TableLayer:showPlayerInfo(infoTbl)       -- 查看玩家信息
+function TableLayer:showPlayerInfo(dwUserID,dwShamUserID)       -- 查看玩家信息
     Common:palyButton()
-    require("common.SceneMgr"):switchOperation(require("app.MyApp"):create(infoTbl, self):createGame("game.puke.PDKPersonInfor"))
-    --require("common.PersonalLayer"):create(GameCommon.tableConfig.wKindID,dwUserID,dwShamUserID)
+    --require("common.SceneMgr"):switchOperation(require("app.MyApp"):create(infoTbl, self):createGame("game.puke.PDKPersonInfor"))
+    require("common.PersonalLayer"):create(GameCommon.tableConfig.wKindID,dwUserID,dwShamUserID)
 end
 function TableLayer:showChat(pBuffer)
     local viewID = GameCommon:getViewIDByChairID(pBuffer.dwUserID, true)
@@ -2435,7 +2461,7 @@ end
 function TableLayer:getViewWorldPosByChairID(wChairID)
 	for key, var in pairs(GameCommon.player) do
 		if wChairID == var.wChairID then
-			local viewid = GameCommon:getViewIDByChairID(var.wChairID, true)
+			local viewid = GameCommon:getViewIDByChairID(var.wChairID)
 			local uiPanel_player = ccui.Helper:seekWidgetByName(self.root, string.format("Panel_player%d", viewid))
 			local uiImage_avatar = ccui.Helper:seekWidgetByName(uiPanel_player, "Image_avatar")
 			return uiImage_avatar:getParent():convertToWorldSpace(cc.p(uiImage_avatar:getPosition()))
@@ -2455,14 +2481,15 @@ function TableLayer:playSketlAnim(sChairID, eChairID, index,indexEx)
         v:setVisible(false)
     end
 
-	local Animation = require("game.puke.Animation")
-	local AnimCnf = Animation[24]
+	local Animation = require("game.paohuzi.Animation")
+	local AnimCnf = Animation[22]
 	
 	if not AnimCnf[index] then
 		return
 	end
     
-    local skele_key_name = 'hyhudong_' .. index .. indexEx
+    indexEx = indexEx or ''
+	local skele_key_name = 'hhhudong_' .. index .. indexEx
 	local spos = self:getViewWorldPosByChairID(sChairID)
 	local epos = self:getViewWorldPosByChairID(eChairID)
 	local image = ccui.ImageView:create(AnimCnf[index].imageFile .. '.png')
@@ -2478,7 +2505,7 @@ function TableLayer:playSketlAnim(sChairID, eChairID, index,indexEx)
 			skeletonNode:setName(skele_key_name)
 		end
 		skeletonNode:setPosition(epos)
-		skeletonNode:setAnimation(0, AnimCnf[index].animName, false)
+		skeletonNode:setAnimation(0, 'animation', false)
 		skeletonNode:setVisible(true)
 		image:removeFromParent()
 
@@ -2494,7 +2521,6 @@ function TableLayer:playSketlAnim(sChairID, eChairID, index,indexEx)
 				soundFile = sound[0]
 			end
 		end
-		
 		if soundFile ~= "" then
 			require("common.Common"):playEffect(soundFile)
 		end
@@ -2504,7 +2530,7 @@ end
 
 --表情互动
 function TableLayer:playSkelStartToEndPos(sChairID, eChairID, index)
-	self.isOpen = cc.UserDefault:getInstance():getBoolForKey('PDKOpenUserEffect', true) --是否接受别人的互动
+	self.isOpen = cc.UserDefault:getInstance():getBoolForKey('HHOpenUserEffect', true) --是否接受别人的互动
 	
 	if GameCommon.meChairID == sChairID then --我发出
 		if sChairID == eChairID then
@@ -2514,7 +2540,7 @@ function TableLayer:playSkelStartToEndPos(sChairID, eChairID, index)
 				end
 			end
 		else
-			self:playSketlAnim(sChairID, eChairID, index,0)
+			self:playSketlAnim(sChairID, eChairID, index)
 		end
 	else
 		if self.isOpen then
@@ -2525,7 +2551,7 @@ function TableLayer:playSkelStartToEndPos(sChairID, eChairID, index)
 					end
 				end
 			else
-				self:playSketlAnim(sChairID, eChairID, index,0)
+				self:playSketlAnim(sChairID, eChairID, index)
 			end
 		end
 	end

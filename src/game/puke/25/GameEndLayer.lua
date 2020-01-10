@@ -140,7 +140,16 @@ function GameEndLayer:onCreate(pBuffer)
             uiImage_red10:setVisible(false)
         end
         local uiText_result = ccui.Helper:seekWidgetByName(root,"Text_result")
-        uiText_result:setString(string.format("%d",pBuffer.lGameScore[key+1]))      
+        --uiText_result:setString(string.format("%d",pBuffer.lGameScore[key+1]))    
+        local dwGold = pBuffer.fWriteScoreArr[var.wChairID + 1]/100
+        if pBuffer.lGameScore[var.wChairID + 1] > 0 then 
+            uiText_result:setTextColor(cc.c3b(175,49,52))  
+            uiText_result:setString(string.format(" +%d\n(赛:+%0.2f)",pBuffer.lGameScore[var.wChairID + 1],dwGold))
+        else  
+            uiText_result:setTextColor(cc.c3b(30,85,60))     
+            uiText_result:setString(string.format(" %d\n(赛:%0.2f)",pBuffer.lGameScore[var.wChairID + 1],dwGold))
+        end   
+    
         local uiText_abandon = ccui.Helper:seekWidgetByName(root,"Text_abandon")
         if pBuffer.wChariIDAbandon == var.wChairID then
             uiText_abandon:setString("(放走包赔)")

@@ -297,6 +297,7 @@ function GameCommon:init()
     self.bIsOutCardTips = false
     self.isNoTongZi = true                  -- true 听牌保留筒子  false 听牌去掉筒子   
     self.bActionCard = {}   -- 开杠后临时保存
+    self.IsOfHu = 0                       -- 是否胡牌提醒
 end
 
 function GameCommon:getRoleChairID()

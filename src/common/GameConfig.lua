@@ -194,7 +194,8 @@ function GameConfig:getParameter(wKindID,luaFunc)
         data.bHostedTime = luaFunc:readRecvByte()                 --托管时间
         data.bHostedSession = luaFunc:readRecvByte()                 --托管局数
         data.b4Add2 = luaFunc:readRecvByte()                --是否可4带2        0无      1有
-        haveReadByte = 13    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
+        data.bDel345 = luaFunc:readRecvByte()                --是否去掉345       
+        haveReadByte = 14    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
         
     elseif wKindID == 36 then
         data.FanXing = {}
@@ -346,8 +347,10 @@ function GameConfig:getParameter(wKindID,luaFunc)
         data.bWuTong = luaFunc:readRecvByte()
         data.mMaOne  = luaFunc:readRecvByte()
         data.mZTLLSFlag  = luaFunc:readRecvByte()       
-        data.mKGNPFlag  = luaFunc:readRecvByte()     
-        haveReadByte = 19    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
+        data.mKGNPFlag  = luaFunc:readRecvByte()    
+        data.bHostedTime = luaFunc:readRecvByte()               --托管时间
+        data.bHostedSession = luaFunc:readRecvByte()                 --托管局数 
+        haveReadByte = 21    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
            
     elseif wKindID == 51 or wKindID == 55 or wKindID == 56 or wKindID == 57 or wKindID == 58 or wKindID == 59 then
         data.bPlayerCount = luaFunc:readRecvByte()
@@ -512,7 +515,9 @@ function GameConfig:getParameter(wKindID,luaFunc)
         data.bTurn = luaFunc:readRecvByte()
         data.bDeathCard =luaFunc:readRecvByte()                     --亡牌
         data.bStartBanker = luaFunc:readRecvByte()                    --随机庄
-        haveReadByte = 23    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
+        data.bHostedTime = luaFunc:readRecvByte()                 --托管时间
+        data.bHostedSession = luaFunc:readRecvByte()                 --托管局数
+        haveReadByte = 25    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
         
     elseif wKindID == 48 then 
         data.FanXing = {}
@@ -540,7 +545,9 @@ function GameConfig:getParameter(wKindID,luaFunc)
         data.bHuangFanAddUp = luaFunc:readRecvByte()
         data.bTingHuAll = luaFunc:readRecvByte()
         data.bDeathCard = luaFunc:readRecvByte()                    --0 不抽低  1 抽牌20张 
-        haveReadByte = 28    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
+        data.bHostedTime = luaFunc:readRecvByte()                 --托管时间
+        data.bHostedSession = luaFunc:readRecvByte()                 --托管局数
+        haveReadByte = 30    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
         
     elseif wKindID == 49 then 
         data.FanXing = {}
@@ -565,7 +572,9 @@ function GameConfig:getParameter(wKindID,luaFunc)
         data.bStartBanker = luaFunc:readRecvByte()                    --随机庄
         data.bHuangFanAddUp = luaFunc:readRecvByte()                    --黄番
         data.STWK = luaFunc:readRecvByte()                    --三五
-        haveReadByte = 25    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
+        data.bHostedTime = luaFunc:readRecvByte()                 --托管时间
+        data.bHostedSession = luaFunc:readRecvByte()                 --托管局数
+        haveReadByte = 27    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
         
     elseif wKindID == 52 then
         data.bPlayerCount = luaFunc:readRecvByte()--参与游戏的人数           
@@ -678,9 +687,15 @@ function GameConfig:getParameter(wKindID,luaFunc)
         data.bNiaoType = luaFunc:readRecvByte()             --1.一鸟一分、2.一鸟两分
         data.bQiDui = luaFunc:readRecvByte()
         data.bWuTong = luaFunc:readRecvByte()
-        haveReadByte = 11    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节    
+        data.bHostedTime = luaFunc:readRecvByte()                 --托管时间
+        data.bHostedSession = luaFunc:readRecvByte()                 --托管局数
+        haveReadByte = 13    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节    
     else
     
+    end
+    
+    for i = haveReadByte+1, 128 do
+        luaFunc:readRecvByte()
     end
     
     return data, haveReadByte

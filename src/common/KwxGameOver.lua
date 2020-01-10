@@ -290,14 +290,40 @@ function KwxGameOver:updatePlayerInfo(pBuffer)
 	
 
 		local uiAtlasLabel_integral = ccui.Helper:seekWidgetByName(item, "AtlasLabel_integral")
-		local addAtlasLab = ccui.Helper:seekWidgetByName(item,'AtlasLabel_integraladd');
-		addAtlasLab:setVisible(tScoreInfo.totalScore >= 0)
-		uiAtlasLabel_integral:setVisible(tScoreInfo.totalScore < 0)
-		if tScoreInfo.totalScore >= 0 then
-			addAtlasLab:setStringValue('/'.. self:getScore(tScoreInfo.totalScore))
-		else
-			uiAtlasLabel_integral:setStringValue( '/'.. self:getScore(tScoreInfo.totalScore))
-		end
+		uiAtlasLabel_integral:setVisible(false)	
+
+		local uiText_dwGold = ccui.Helper:seekWidgetByName(item,"Text_dwGold")
+		uiText_dwGold:setFontName("fonts/DFYuanW7-GB2312.ttf")
+		local dwGold = tScoreInfo.totalScore
+		if pBuffer.tWriteScoreArr[i] > 0 then 
+			uiText_dwGold:setTextColor(cc.c3b(175,49,52))  
+			uiText_dwGold:setString(string.format(" +%d",dwGold))
+		else 
+			uiText_dwGold:setTextColor(cc.c3b(30,85,60))    
+			uiText_dwGold:setString(string.format(" %d",dwGold))
+		end 
+			
+		local uiText_result = ccui.Helper:seekWidgetByName(item,"Text_result")
+		uiText_result:setFontName("fonts/DFYuanW7-GB2312.ttf")
+		local dwGold = pBuffer.tWriteScoreArr[i]/100
+		if pBuffer.tWriteScoreArr[i] > 0 then 
+			uiText_result:setTextColor(cc.c3b(175,49,52))  
+			uiText_result:setString(string.format(" (赛:+%0.2f)",dwGold))
+		else 
+			uiText_result:setTextColor(cc.c3b(30,85,60))       
+			uiText_result:setString(string.format(" (赛:%0.2f)",dwGold))
+		end 
+
+		local addAtlasLab = ccui.Helper:seekWidgetByName(item,'AtlasLabel_integraladd');		
+		addAtlasLab:setVisible(false)	
+
+		-- addAtlasLab:setVisible(tScoreInfo.totalScore >= 0)
+		-- uiAtlasLabel_integral:setVisible(tScoreInfo.totalScore < 0)
+		-- if tScoreInfo.totalScore >= 0 then
+		-- 	addAtlasLab:setStringValue('/'.. self:getScore(tScoreInfo.totalScore))
+		-- else
+		-- 	uiAtlasLabel_integral:setStringValue( '/'.. self:getScore(tScoreInfo.totalScore))
+		-- end
 		--self:updatePlayerStatics(item, pBuffer.statistics[i],tScoreInfo.totalScore)
 
 		self:updatePlayerStaticsNum(item, tScoreInfo,pBuffer)

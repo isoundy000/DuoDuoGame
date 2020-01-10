@@ -98,7 +98,10 @@ function InterfaceJoinRoomNode:SUB_GR_JOIN_TABLE_FAILED(event)
     elseif data.wErrorCode == 27 then
         require("common.MsgBoxLayer"):create(2,nil,"亲友圈玩法不存在,请重新刷新亲友圈!")
     elseif data.wErrorCode == 28 then
-        require("common.MsgBoxLayer"):create(2,nil,"您的元宝不足,请及时充值!")
+        require("common.MsgBoxLayer"):create(1,nil,"您的元宝不足,请及时充值!",function() 
+            local data = clone(UserData.Share.tableShareParameter[12])
+            require("app.MyApp"):create(data):createView("ShareLayer")
+        end)
     elseif data.wErrorCode == 29 then
         require("common.MsgBoxLayer"):create(2,nil,"防沉迷值已达下限!")
     elseif data.wErrorCode == 30 then

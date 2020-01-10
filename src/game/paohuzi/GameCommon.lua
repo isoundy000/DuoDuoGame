@@ -171,7 +171,7 @@ local GameCommon = {
     cbAllHuXiCount = nil ,                          --告胡子类型金币房总胡息
     EARTH_RADIUS = 6371.004 ,                     --地球半径   
     DistanceAlarm = 1 ,                 -- 距离判断（0：没有判断多，需要判断。1：判断过或不需要判断）
-    IsOfHu = 0 ,                        -- 是否胡牌提醒
+    IsOfHu = 0 ,                       -- 是否胡牌提醒
     -------------------------------------------------------------------------------
     meChairID = 0,
 
@@ -216,6 +216,7 @@ function GameCommon:init()
     self.bIsHuangZhuang = false
 
     self.handHuXiNum = 0
+    self.IsOfHu = 0
 end
 
 function GameCommon:getViewIDByChairID(wChairID, isNoSwitch)
@@ -370,11 +371,7 @@ function GameCommon:GetCardHand(data)
         cardIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCard,0)
     end
     local cardBgIndex =nil
-    if CHANNEL_ID == 10 or CHANNEL_ID == 11 or CHANNEL_ID == 26 or CHANNEL_ID == 27 or CHANNEL_ID == 2 or CHANNEL_ID == 3 then 
-        cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,1)
-    else
-        cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,0)
-    end
+    cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,0)
     if data == 0 then
         if cardBgIndex ~= 0 then
             imgCard = ccui.ImageView:create("zipai/card_bg/card_bg0/card_bg_1.png")
@@ -426,11 +423,7 @@ function GameCommon:getSendOrOutCard(data, isSendCard)
         cardIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCard,0)
     end
     local cardBgIndex =nil
-    if CHANNEL_ID == 10 or CHANNEL_ID == 11 or CHANNEL_ID == 26 or CHANNEL_ID == 27 or CHANNEL_ID == 2 or CHANNEL_ID == 3  then 
-        cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,1)
-    else
-        cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,0)
-    end
+    cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,0)
     local imgBg = nil
     if isSendCard == true then
         imgBg = ccui.ImageView:create("zipai/table/card_send_card_bj.png")    
@@ -490,11 +483,7 @@ function GameCommon:getDiscardCardAndWeaveItemArrayAnimation(data)
         cardIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCard,0)
     end
     local cardBgIndex =nil
-    if CHANNEL_ID == 10 or CHANNEL_ID == 11 or CHANNEL_ID == 26 or CHANNEL_ID == 27 or CHANNEL_ID == 2 or CHANNEL_ID == 3  then 
-        cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,1)
-    else
-        cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,0)
-    end
+    cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,0)
     local imgCard = nil
     if data == 0 then
         if cardBgIndex ~= 0 then
@@ -547,11 +536,7 @@ function GameCommon:getDiscardCardAndWeaveItemArray(data)
         cardIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCard,0)
     end
     local cardBgIndex =nil
-    if CHANNEL_ID == 10 or CHANNEL_ID == 11 or CHANNEL_ID == 26 or CHANNEL_ID == 27 or CHANNEL_ID == 2 or CHANNEL_ID == 3  then 
-        cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,1)
-    else
-        cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,0)
-    end
+    cardBgIndex = cc.UserDefault:getInstance():getIntegerForKey(Default.UserDefault_ZiPaiCardBg,0)
     local imgCard = nil
     if data == 0 then
         if cardBgIndex ~= 0 then
@@ -606,7 +591,24 @@ function GameCommon:playAnimation(root, id, wChairID)
     if AnimationData == nil then
         return
     end
-    if AnimationData.animFile ~= "" then
+
+    if AnimationData.png~= nil and AnimationData.png ~= "" then  --animFile
+        local visibleSize = cc.Director:getInstance():getVisibleSize()
+        local uiPanel_tipsCard = ccui.Helper:seekWidgetByName(root,"Panel_tipsCard")
+        local armature = ccui.ImageView:create(AnimationData.png)
+        print("——————+++++++++动画图片",AnimationData.png)
+        uiPanel_tipsCard:addChild(armature)       
+        armature:setScale(1.5)
+        local viewID = GameCommon:getViewIDByChairID(wChairID)
+        local uiPanel_tipsCardPos = ccui.Helper:seekWidgetByName(root,string.format("Panel_tipsCardPos%d",viewID))
+        armature:setPosition(uiPanel_tipsCardPos:getPosition())
+        armature:runAction(cc.Sequence:create(
+            cc.ScaleTo:create(0.1,1),
+            cc.DelayTime:create(0.5),
+            cc.FadeOut:create(0.6),
+            cc.RemoveSelf:create()))
+            
+   elseif AnimationData.animFile~= nil and  AnimationData.animFile ~= "" then
         local visibleSize = cc.Director:getInstance():getVisibleSize()
         local uiPanel_tipsCard = ccui.Helper:seekWidgetByName(root,"Panel_tipsCard")
         ccs.ArmatureDataManager:getInstance():addArmatureFileInfo(AnimationData.animFile)
@@ -623,6 +625,7 @@ function GameCommon:playAnimation(root, id, wChairID)
             cc.DelayTime:create(1.0),
             cc.FadeOut:create(1.0),
             cc.RemoveSelf:create()))
+
         if id == "黄庄" then
             armature:setPosition(visibleSize.width/2, visibleSize.height/2)
             require("common.Common"):playEffect("common/huangzhuang.mp3")
@@ -639,12 +642,9 @@ function GameCommon:playAnimation(root, id, wChairID)
             local viewID = GameCommon:getViewIDByChairID(wChairID)
             local uiPanel_tipsCardPos = ccui.Helper:seekWidgetByName(root,string.format("Panel_tipsCardPos%d",viewID))
             armature:setPosition(uiPanel_tipsCardPos:getPosition())   
-
-			if id == "胡"  and( CHANNEL_ID == 6 or CHANNEL_ID == 7) then
-				require("common.Common"):playEffect("common/win.mp3")
-			end 
         end
     end
+
     local soundFile = ""
     if wChairID ~= nil then
         soundFile = AnimationData.sound[GameCommon.player[wChairID].cbSex]

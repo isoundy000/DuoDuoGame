@@ -266,17 +266,26 @@ function GameEndLayer:onCreate(pBuffer)
         if GameCommon.tableConfig.nTableType == TableType_GoldRoom or GameCommon.tableConfig.nTableType  == TableType_SportsRoom then
             uiText_ID:setVisible(false)
         end 
-        local dwGold = Common:itemNumberToString(pBuffer.lGameScore[var.wChairID + 1])   
-        if pBuffer.lGameScore[var.wChairID + 1] > 0 then 
-            uiAtlasLabel_money:setString('+' ..tostring(dwGold))
-        else      
-            uiAtlasLabel_money:setString(tostring(dwGold))
-        end     
+        --local dwGold = Common:itemNumberToString(pBuffer.lGameScore[var.wChairID + 1])   
+        -- if pBuffer.lGameScore[var.wChairID + 1] > 0 then 
+        --     uiAtlasLabel_money:setString('+' ..tostring(dwGold))
+        -- else      
+        --     uiAtlasLabel_money:setString(tostring(dwGold))
+        -- end     
     --    uiAtlasLabel_money:setString(string.format("%d",pBuffer.lGameScore[var.wChairID+1] ))
        
+        local dwGold = pBuffer.fWriteScoreArr[var.wChairID + 1]/100
+        if pBuffer.lGameScore[var.wChairID + 1] > 0 then
+            uiAtlasLabel_money:setTextColor(cc.c3b(255,156,74))   
+            uiAtlasLabel_money:setString(string.format(" +%d\n(赛:+%0.2f)",pBuffer.lGameScore[var.wChairID + 1],dwGold))
+        else
+            uiAtlasLabel_money:setTextColor(cc.c3b(51,222,178))        
+            uiAtlasLabel_money:setString(string.format(" %d\n(赛:%0.2f)",pBuffer.lGameScore[var.wChairID + 1],dwGold))
+        end
+
         if var.wChairID == GameCommon.meChairID then 
             uiText_name:setColor(cc.c3b(255,255,0))
-            uiAtlasLabel_money:setColor(cc.c3b(255,255,0))
+            --uiAtlasLabel_money:setColor(cc.c3b(255,255,0))
         end 
 
         if GameCommon.gameConfig.bPlayerCount == 4 then

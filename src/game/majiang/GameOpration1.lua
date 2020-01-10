@@ -155,8 +155,9 @@ function GameOpration:showOpration(pBuffer)
         Common:addTouchEventListener(item,function() 
             if GameCommon.IsOfHu == 1 then
                 require("common.MsgBoxLayer"):create(1,nil,"是否放弃胡牌？",function()
-                     NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OPERATE_CARD,"wb",GameCommon.WIK_NULL,0)
-            	     self:removeFromParent()
+                    GameCommon.IsOfHu = 0
+                    NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OPERATE_CARD,"wb",GameCommon.WIK_NULL,0)
+            	    self:removeFromParent()
                 end)
             else                             
                  NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OPERATE_CARD,"wb",GameCommon.WIK_NULL,0)

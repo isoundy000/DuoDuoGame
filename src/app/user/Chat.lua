@@ -85,11 +85,8 @@ function Chat:EVENT_TYPE_NET_RECV_MESSAGE(event)
             data.dwTableID = luaFunc:readRecvDWORD()
             data.wGameCount = luaFunc:readRecvWORD()
             data.wKindID = luaFunc:readRecvWORD()
-            local haveReadByte = 0
-            data.tableParameter, haveReadByte = require("common.GameConfig"):getParameter(data.wKindID,luaFunc)
-            if haveReadByte < 128 then
-                luaFunc:readRecvBuffer(128-haveReadByte)
-            end
+            data.tableParameter = require("common.GameConfig"):getParameter(data.wKindID,luaFunc)
+            data.szTableName = luaFunc:readRecvString(32)
         end
         if data.cbType == 5 then
             EventMgr:dispatch(EventType.RET_CLUB_CHAT_BACK_RECORD,data)
@@ -148,11 +145,7 @@ function Chat:EVENT_TYPE_NET_RECV_MESSAGE(event)
             data.dwTableID = luaFunc:readRecvDWORD()
             data.wGameCount = luaFunc:readRecvWORD()
             data.wKindID = luaFunc:readRecvWORD()
-            local haveReadByte = 0
-            data.tableParameter, haveReadByte = require("common.GameConfig"):getParameter(data.wKindID,luaFunc)
-            if haveReadByte < 128 then
-                luaFunc:readRecvBuffer(128-haveReadByte)
-            end
+            data.tableParameter = require("common.GameConfig"):getParameter(data.wKindID,luaFunc)
         end
         if data.cbType == 5 then
             EventMgr:dispatch(EventType.RET_CLUB_CHAT_RECORD_ZUJU,data)

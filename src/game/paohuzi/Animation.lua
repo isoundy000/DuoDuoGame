@@ -27,8 +27,9 @@ local Animation = {
             }
         },
         [3] = {
-            animFile = "zipai/animation/chi-texiao3/chi-texiao.ExportJson",
-            animName = "chi-texiao",
+            -- animFile = "zipai/animation/chi-texiao3/chi-texiao.ExportJson",
+            -- animName = "chi-texiao",
+            png = "zipai/animation/chi.png",
             sound = {
                 [0] = "zipai/sound/changde/card_g_chi.mp3",
                 [1] = "zipai/sound/changde/card_b_chi.mp3",
@@ -70,8 +71,9 @@ local Animation = {
             }
         },
         [3] = {
-            animFile = "zipai/animation/bi-texiao3/bi-texiao.ExportJson",
-            animName = "bi-texiao",
+            -- animFile = "zipai/animation/bi-texiao3/bi-texiao.ExportJson",
+            -- animName = "bi-texiao",
+            png = "zipai/animation/chi.png",
             sound = {
                 [0] = "zipai/sound/changde/card_g_chi.mp3",
                 [1] = "zipai/sound/changde/card_b_chi.mp3",
@@ -113,8 +115,9 @@ local Animation = {
             }
         },
         [3] = {
-            animFile = "zipai/animation/peng-texiao3/peng-texiao.ExportJson",
-            animName = "peng-texiao",
+            -- animFile = "zipai/animation/peng-texiao3/peng-texiao.ExportJson",
+            -- animName = "peng-texiao",
+            png = "zipai/animation/peng.png",
             sound = {
                 [0] = "zipai/sound/changde/card_g_peng.mp3",
                 [1] = "zipai/sound/changde/card_b_peng.mp3",
@@ -156,8 +159,9 @@ local Animation = {
             }
         },
         [3] = {
-            animFile = "zipai/animation/wei-texiao3/wei-texiao.ExportJson",
-            animName = "wei-texiao",
+            -- animFile = "zipai/animation/wei-texiao3/wei-texiao.ExportJson",
+            -- animName = "wei-texiao",
+            png = "zipai/animation/wei.png",
             sound = {
                 [0] = "zipai/sound/changde/card_g_wei.mp3",
                 [1] = "zipai/sound/changde/card_b_wei.mp3",
@@ -199,8 +203,9 @@ local Animation = {
             }
         },
         [3] = {
-            animFile = "zipai/animation/chouwei-texiao3/chouwei-texiao.ExportJson",
-            animName = "chouwei-texiao",
+            -- animFile = "zipai/animation/chouwei-texiao3/chouwei-texiao.ExportJson",
+            -- animName = "chouwei-texiao",
+            png = "zipai/animation/chouwei.png",
             sound = {
                 [0] = "zipai/sound/changde/card_g_chouwei.mp3",
                 [1] = "zipai/sound/changde/card_b_chouwei.mp3",
@@ -242,8 +247,9 @@ local Animation = {
             }
         },
         [3] = {
-            animFile = "zipai/animation/ti-texiao3/ti-texiao.ExportJson",
-            animName = "ti-texiao",
+            -- animFile = "zipai/animation/ti-texiao3/ti-texiao.ExportJson",
+            -- animName = "ti-texiao",
+            png = "zipai/animation/ti.png",
             sound = {
                 [0] = "zipai/sound/changde/card_g_ti.mp3",
                 [1] = "zipai/sound/changde/card_b_ti.mp3",
@@ -285,8 +291,9 @@ local Animation = {
             }
         },
         [3] = {
-            animFile = "zipai/animation/pao-texiao3/pao-texiao.ExportJson",
-            animName = "pao-texiao",
+            -- animFile = "zipai/animation/pao-texiao3/pao-texiao.ExportJson",
+            -- animName = "pao-texiao",
+            png = "zipai/animation/pao.png",
             sound = {
                 [0] = "zipai/sound/changde/card_g_pao.mp3",
                 [1] = "zipai/sound/changde/card_b_pao.mp3",
@@ -539,8 +546,9 @@ local Animation = {
             }
         },
         [3] = {
-            animFile = "zipai/animation/hupai-donghua2/hupai-donghua.ExportJson",
-            animName = "hupai-donghua",
+            -- animFile = "zipai/animation/hupai-donghua2/hupai-donghua.ExportJson",
+            -- animName = "hupai-donghua",
+            png = "zipai/animation/hu.png",
             sound = {
                 [0] = "zipai/sound/changde/card_g_hu.mp3",
                 [1] = "zipai/sound/changde/card_b_hu.mp3",

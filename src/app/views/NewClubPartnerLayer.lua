@@ -654,7 +654,7 @@ function NewClubPartnerLayer:insertOncePartnerMember(data, listView)
     Text_dyjNum:setString(data.dwWinnerCount or 0)
     Text_cyNum:setString(data.dwGameCount or 0)
     Text_ybNum:setString(data.lYuanBaoCount or 0)
-    Text_jfNum:setString(data.lScore or 0)
+    Text_jfNum:setString(data.lScorePoint or 0)
 
     self:setStopPlayState(item, data.isProhibit, data.cbOnlineStatus)
     
@@ -1032,7 +1032,7 @@ function NewClubPartnerLayer:RET_GET_CLUB_PARTNER(event)
         self.Text_dyj_total:setString(data.dwWinnerCount)
         self.Text_cy_total:setString(data.dwGameCount)
         self.Text_yb_total:setString(data.lYuanBaoCount)
-        self.Text_jf_total:setString(data.lScore)
+        self.Text_jf_total:setString(data.lScorePoint)
         self.pCurPage = 1
         self.pReqState = 0
         self:reqClubPartnerMember()
@@ -1405,12 +1405,26 @@ function NewClubPartnerLayer:RET_SETTINGS_CLUB_MEMBER(event)
             require("common.MsgBoxLayer"):create(0,nil,"普通成员才可以设置为合伙人!")
         elseif data.lRet == 5 then
             require("common.MsgBoxLayer"):create(0,nil,"您的权限不足!")
-        elseif data.lRet == 100 then
-            require("common.MsgBoxLayer"):create(0,nil,"对局中不能减少疲劳值")
+        elseif data.lRet == 6 then
+            require("common.MsgBoxLayer"):create(0,nil,"权限不足,只有合伙人才能设置!")
+        elseif data.lRet == 7 then
+            require("common.MsgBoxLayer"):create(0,nil,"合伙人疲劳值不足!")
+        elseif data.lRet == 8 then
+            require("common.MsgBoxLayer"):create(0,nil,"目标玩家疲劳值不足!")
+        elseif data.lRet == 9 then
+            require("common.MsgBoxLayer"):create(0,nil,"合伙人的疲劳值不够扣!")
+        elseif data.lRet == 10 then
+            require("common.MsgBoxLayer"):create(0,nil,"参数错误!")
+        elseif data.lRet == 11 then
+            require("common.MsgBoxLayer"):create(0,nil,"比例超过最大限!")
         elseif data.lRet == 12 then
             require("common.MsgBoxLayer"):create(0,nil,"超层级上限不能设置合伙人!")
+        elseif data.lRet == 13 then
+            require("common.MsgBoxLayer"):create(0,nil,"防沉迷不等于0不得设置!")
+        elseif data.lRet == 100 then
+            require("common.MsgBoxLayer"):create(0,nil,"对局中不能减少疲劳值!")
         else
-            require("common.MsgBoxLayer"):create(0,nil,"设置错误! lRet=" .. data.lRet)
+            require("common.MsgBoxLayer"):create(0,nil,"设置错误! code=" .. data.lRet)
         end
         return
     end
@@ -1471,7 +1485,7 @@ function NewClubPartnerLayer:RET_CLUB_PARTNER_COUNT(event)
     self.Text_partner_yb:setString(data.dwTargetYuanBaoIncome)
     self.Text_partner_plz:setString(data.dwTargetFatigueIncome)
     self.Text_partner_dyj:setString(data.dwBigWinnerTime)
-    self.Text_partner_totalJf:setString(data.lTotalScoreTotal)
+    self.Text_partner_totalJf:setString(data.lTotalScorePoint)
     self.partnerCountPage = 1
     if self.clubData.dwUserID == UserData.User.userID or self:isAdmin(UserData.User.userID) then
         UserData.Guild:getClubPagePartnerCount(self.clubData.dwClubID, 0, self.beganTime, self.endTime, 1)
@@ -1515,7 +1529,7 @@ function NewClubPartnerLayer:RET_CLUB_PAGE_PARTNER_COUNT(event)
     Text_yuanbao:setString(data.dwTargetYuanBaoIncome)
     Text_dyj:setString(data.dwBigWinnerTime)
     Text_renci:setString(data.dwPeopleCount)
-    Text_sorce:setString(data.lTotalScoreTotal)
+    Text_sorce:setString(data.lTotalScorePoint)
 
     Common:addTouchEventListener(Button_push,function()
         self.Image_partnerTotal:setVisible(false)

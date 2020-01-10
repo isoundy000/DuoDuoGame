@@ -377,11 +377,26 @@ function GameEndLayer:onCreate(pBuffer)
         Text_GangFunzi:setColor(cc.c3b(127,90,46))
         Text_GangFunzi:setString("")--码数
         local uiAtlasLabel_score = ccui.Helper:seekWidgetByName(item,"AtlasLabel_score")
-        if pBuffer.lGameScore[i] < 0 then       
-            uiAtlasLabel_score:setProperty(string.format("/%d",pBuffer.lGameScore[i]),"fonts/font_num_blue.png",26,34,'/')              
-        elseif  pBuffer.lGameScore[i] >= 0 then
-            uiAtlasLabel_score:setProperty(string.format("/%d",pBuffer.lGameScore[i]),"fonts/font_num_red.png",26,34,'/')
+
+        uiAtlasLabel_score:setVisible(false)
+
+        local uiText_result = ccui.Helper:seekWidgetByName(item,"Text_result")
+        uiText_result:setTextColor(cc.c3b(255,209,81))
+        uiText_result:setFontName("fonts/DFYuanW7-GB2312.ttf")
+        local dwGold = pBuffer.fWriteScoreArr[i]/100
+        if pBuffer.lGameScore[i] > 0 then 
+            uiText_result:setTextColor(cc.c3b(175,49,52))  
+            uiText_result:setString(string.format(" +%d\n(赛:+%0.2f)",pBuffer.lGameScore[i],dwGold))
+        else      
+            uiText_result:setTextColor(cc.c3b(30,85,60))   
+            uiText_result:setString(string.format(" %d\n(赛:%0.2f)",pBuffer.lGameScore[i],dwGold))
         end
+
+        -- if pBuffer.lGameScore[i] < 0 then       
+        --     uiAtlasLabel_score:setProperty(string.format("/%d",pBuffer.lGameScore[i]),"fonts/font_num_blue.png",26,34,'/')              
+        -- elseif  pBuffer.lGameScore[i] >= 0 then
+        --     uiAtlasLabel_score:setProperty(string.format("/%d",pBuffer.lGameScore[i]),"fonts/font_num_red.png",26,34,'/')
+        -- end
         local Text_zhongfen = ccui.Helper:seekWidgetByName(item,"Text_zhongfen")
         Text_zhongfen:setColor(cc.c3b(127,90,46))
     end

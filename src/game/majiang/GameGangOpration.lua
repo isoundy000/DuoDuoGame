@@ -146,8 +146,9 @@ function GameGangOpration:showOpration(pBuffer)
         local item = ccui.Button:create(img,img,img)
         uiListView_Opration:pushBackCustomItem(item)
         Common:addTouchEventListener(item,function() 
-        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OPERATE_CARD,"wb",GameCommon.WIK_NULL,0)
-        self:removeFromParent()
+            GameCommon.IsOfHu = 0
+            NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OPERATE_CARD,"wb",GameCommon.WIK_NULL,0)
+            self:removeFromParent()
         end)
     end
     for key, var in pairs(uiListView_Opration:getItems()) do

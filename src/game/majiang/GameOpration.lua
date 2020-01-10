@@ -93,6 +93,7 @@ function GameOpration:showOpration(pBuffer)
     end
     --补
     if Bit:_and(cbOperateCode,GameCommon.WIK_FILL) ~= 0 then
+        GameCommon.iNOoutcard = true
         local img = "game/op_bu.png"
         local item = ccui.Button:create(img,img,img)
         uiListView_Opration:pushBackCustomItem(item)
@@ -102,6 +103,7 @@ function GameOpration:showOpration(pBuffer)
     end
     --杠
     if Bit:_and(cbOperateCode,GameCommon.WIK_GANG) ~= 0 then
+        GameCommon.iNOoutcard = true
         local img = "game/op_gang.png"
         local item = ccui.Button:create(img,img,img)
         uiListView_Opration:pushBackCustomItem(item)
@@ -739,6 +741,7 @@ function GameOpration:dealBiHu(pBuffer)
 end
 
 function GameOpration:dealGuo(pBuffer)
+    GameCommon.IsOfHu = 0
     if GameCommon.tableConfig.wKindID == 65 then 
         NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_OPERATE_CARD,"wbbbb",GameCommon.WIK_NULL,0,0,0,0)
     else

@@ -364,8 +364,8 @@ function NewRecord:createSubRecord( data )
 			if not self.totalScore[i] then
 				self.totalScore[i] = 0
 			end
-			self.totalScore[i] = self.totalScore[i] + data.lScore[i]
-			self:setStrColor(score,data.lScore[i],'分')
+			self.totalScore[i] = self.totalScore[i] + data.fUserScore[i]
+			self:setStrColor(score,data.fUserScore[i],'分')
 			self:setStrColor(Text_total_score_1,self.totalScore[i],'分')
 		end
 		local Panel_click = self:seekWidgetByNameEx(child,'Panel_click')
@@ -665,7 +665,7 @@ function NewRecord:updateNameItem( item,data )
 			Panel_click:setSwallowTouches(false)
 			text_playername:setString(name)
 			self:setScoreColor(text_playername,3)
-			self:setColor(text_score,data.lScoreEx[i])
+			self:setColor(text_score,data.fAllUserScoreScore[i])
 		end
 	end
 end
@@ -779,7 +779,7 @@ end
 --总战绩分刷新
 function NewRecord:RET_CL_MAIN_RECORD_TOTAL_SCORE( event )
 	local data = event._usedata
-	self:updateTotalScore(data.lScore[0],data.lScore[1],data.lScore[2])
+	self:updateTotalScore(data.fScore[0],data.fScore[1],data.fScore[2])
 end
 
 function NewRecord:SUB_CL_SUB_RECORD( event )

@@ -23,6 +23,11 @@ local AALimit               = 10
 local BigLimit              = 30
 local WinLimit              = 30
 
+if CHANNEL_ID == 10 or CHANNEL_ID == 11 then
+    BigLimit = 20
+    WinLimit = 20
+end
+
 local NewClubPlayWayInfoLayer = class("NewClubPlayWayInfoLayer", cc.load("mvc").ViewBase)
 
 function NewClubPlayWayInfoLayer:onConfig()
@@ -84,7 +89,11 @@ function NewClubPlayWayInfoLayer:onCreate(param)
 	self.TextField_criticalNum:setTouchEnabled(false)
 	self.TextField_powerNum:setTouchEnabled(false)
 	self:initUI(self.clubData, param[2])
-    self.Image_goldMode:setVisible(true)
+    if CHANNEL_ID == 10 or CHANNEL_ID == 11 or CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+        self.Image_goldMode:setVisible(true)
+    else
+        self.Image_goldMode:setVisible(false)
+    end
 end
 
 function NewClubPlayWayInfoLayer:onClose()
@@ -193,10 +202,10 @@ function NewClubPlayWayInfoLayer:onAchieve()
         elseif playTbl.payMode == 3 then
             --AA
             playTbl.payCount1 = tonumber(self.TextField_aaValue:getString())
-            if not Common:isInterNumber(playTbl.payCount1) then
-                require("common.MsgBoxLayer"):create(0,nil,"消耗数量必须非负整数")
-                return
-            end
+            -- if not Common:isInterNumber(playTbl.payCount1) then
+            --     require("common.MsgBoxLayer"):create(0,nil,"消耗数量必须非负整数")
+            --     return
+            -- end
 
             playTbl.payLimit1 = 0
             playTbl.payLimit2 = 0
@@ -213,10 +222,10 @@ function NewClubPlayWayInfoLayer:onAchieve()
                 if item then
                     local TextField_expendLimit = ccui.Helper:seekWidgetByName(item, "TextField_expendLimit")
                     playTbl['payLimit' .. i] = tonumber(TextField_expendLimit:getString())
-                    if not Common:isInterNumber(playTbl['payLimit' .. i]) then
-                        require("common.MsgBoxLayer"):create(0,nil,"消耗数量必须非负整数")
-                        return
-                    end
+                    -- if not Common:isInterNumber(playTbl['payLimit' .. i]) then
+                    --     require("common.MsgBoxLayer"):create(0,nil,"消耗数量必须非负整数")
+                    --     return
+                    -- end
 
                     local TextField_expendNum = ccui.Helper:seekWidgetByName(item, "TextField_expendNum")
                     local textStr = TextField_expendNum:getString()
@@ -229,10 +238,10 @@ function NewClubPlayWayInfoLayer:onAchieve()
                         playTbl['payCount' .. i] = tonumber(textStr) 
                     end
 
-                    if not Common:isInterNumber(playTbl['payCount' .. i]) then
-                        require("common.MsgBoxLayer"):create(0,nil,"消耗数量必须非负整数")
-                        return
-                    end
+                    -- if not Common:isInterNumber(playTbl['payCount' .. i]) then
+                    --     require("common.MsgBoxLayer"):create(0,nil,"消耗数量必须非负整数")
+                    --     return
+                    -- end
 
                     --从小到大检查
                     if limitNum then
@@ -276,26 +285,26 @@ function NewClubPlayWayInfoLayer:onAchieve()
         playTbl.tableLimit = 0
         playTbl.isTableCharge = false
         playTbl.antiCell = tonumber(self.TextField_ceilNum:getString()) or 1
-        playTbl.antiCell = playTbl.antiCell * 100
-        if not Common:isInterNumber(playTbl.antiCell) then
-            require("common.MsgBoxLayer"):create(0,nil,"倍率设置必须是整数")
-            return
-        end
+        playTbl.antiCell = playTbl.antiCell
+        -- if not Common:isInterNumber(playTbl.antiCell) then
+        --     require("common.MsgBoxLayer"):create(0,nil,"倍率设置必须是整数")
+        --     return
+        -- end
     else
         playTbl.isTableCharge = self.clubData.isTableCharge[self.clubData.idx] or false
         if playTbl.isTableCharge then
             playTbl.antiCell = 0
             playTbl.fatigueCell = tonumber(self.TextField_powerNum:getString()) or 1
-            if not Common:isInterNumber(playTbl.fatigueCell) or playTbl.fatigueCell == 0 then
-                require("common.MsgBoxLayer"):create(0,nil,"倍率设置必须是大于零的整数")
-                return
-            end
+            -- if not Common:isInterNumber(playTbl.fatigueCell) or playTbl.fatigueCell == 0 then
+            --     require("common.MsgBoxLayer"):create(0,nil,"倍率设置必须是大于零的整数")
+            --     return
+            -- end
 
             playTbl.tableLimit = tonumber(self.TextField_criticalNum:getString())
-            if not Common:isInterNumber(playTbl.tableLimit) then
-                require("common.MsgBoxLayer"):create(0,nil,"门槛设置必须非负整数")
-                return
-            end
+            -- if not Common:isInterNumber(playTbl.tableLimit) then
+            --     require("common.MsgBoxLayer"):create(0,nil,"门槛设置必须非负整数")
+            --     return
+            -- end
             
             playTbl.fatigueLimit = tonumber(self.Text_autoDissTable:getString()) or 0
         else
@@ -311,6 +320,18 @@ function NewClubPlayWayInfoLayer:onAchieve()
     else
         playTbl.isPercentage = false
     end
+
+    -- 乘以100(解决不能发送小数问题)
+    playTbl.tableLimit = playTbl.tableLimit * 100
+    playTbl.antiCell = playTbl.antiCell * 100
+    playTbl.fatigueCell = playTbl.fatigueCell * 100
+    playTbl.payLimit1 = playTbl.payLimit1
+    playTbl.payCount1 = playTbl.payCount1 * 100
+    playTbl.payLimit2 = playTbl.payLimit2
+    playTbl.payCount2 = playTbl.payCount2 * 100
+    playTbl.payLimit3 = playTbl.payLimit3
+    playTbl.payCount3 = playTbl.payCount3 * 100
+    playTbl.fatigueLimit = playTbl.fatigueLimit * 100
 
     self:megerSetData(playTbl)
     self:sendSetPlayWay(self.clubData)
@@ -340,11 +361,11 @@ function NewClubPlayWayInfoLayer:initUI(data, isModifyPlayName)
     self:switchPayMode(self.payMode)
 
     local idx = data.idx
-    if not data.wTableCell[idx] or data.wTableCell[idx] == 0 then
-        data.wTableCell[idx] = 1
+    if not data.wFatigueCell[idx] or data.wFatigueCell[idx] == 0 then
+        data.wFatigueCell[idx] = 1
     end
     self.TextField_criticalNum:setString(data.lTableLimit[idx] or 0)
-    self.TextField_powerNum:setString(data.wTableCell[idx] or 0)
+    self.TextField_powerNum:setString(data.wFatigueCell[idx] or 0)
     self.TextField_ceilNum:setString(data.wAntiCell[idx] or 1)
     local dwPayCount = data.dwPayCount[idx] or {0,0,0}
     self.TextField_aaValue:setString(dwPayCount[1])
@@ -789,12 +810,12 @@ function NewClubPlayWayInfoLayer:sendSetPlayWay(data)
 
     elseif data.wKindID == 25 or data.wKindID == 26  then  
 
-        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbbbb",
+        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbbbbb",
             data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
             data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,data.antiCell,32,data.szParameterName,
             data.tableParameter.bPlayerCount, data.tableParameter.bStartCard,data.tableParameter.bBombSeparation,data.tableParameter.bRed10,
             data.tableParameter.b4Add3,data.tableParameter.bShowCardCount,data.tableParameter.bSpringMinCount,data.tableParameter.bAbandon,data.tableParameter.bCheating,data.tableParameter.bFalseSpring,
-            data.tableParameter.bHostedTime,data.tableParameter.bHostedSession)
+            data.tableParameter.bHostedTime,data.tableParameter.bHostedSession,data.tableParameter.bDel345)
 
     elseif data.wKindID == 35 then
         NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbwbbbbbbbbdb",
@@ -903,12 +924,12 @@ function NewClubPlayWayInfoLayer:sendSetPlayWay(data)
             data.tableParameter.bQGHuJM,data.tableParameter.bHuangZhuangHG,data.tableParameter.bQingSH,data.tableParameter.bJiePao,data.tableParameter.bNiaoType,data.tableParameter.bWuTong)--,data.tableParameter.bQiDui)
 
     elseif data.wKindID == 68 then
-        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbbb",
+        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbbbbb",
             data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
             data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,data.antiCell,32,data.szParameterName,
             data.tableParameter.bPlayerCount,data.tableParameter.bMaType,data.tableParameter.bMaCount,data.tableParameter.bQGHu,
             data.tableParameter.bQGHuJM,data.tableParameter.bHuangZhuangHG,data.tableParameter.bQingSH,data.tableParameter.bJiePao,data.tableParameter.bNiaoType,data.tableParameter.bQiDui,
-            data.tableParameter.bWuTong)
+            data.tableParameter.bWuTong,data.tableParameter.bHostedTime,data.tableParameter.bHostedSession)
 
     elseif data.wKindID == 46 then
         NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbb",
@@ -925,28 +946,6 @@ function NewClubPlayWayInfoLayer:sendSetPlayWay(data)
             data.tableParameter.bHuangZhuangHG,data.tableParameter.bQingSH,data.tableParameter.bJiePao)
 
     elseif data.wKindID == 47 then
-        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbwbbbbbbbbdbbb",
-            data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
-            data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,data.antiCell,32,data.szParameterName,
-            data.tableParameter.FanXing.bType,data.tableParameter.FanXing.bCount,data.tableParameter.FanXing.bAddTun,
-            data.tableParameter.bPlayerCountType,data.tableParameter.bPlayerCount,data.tableParameter.bLaiZiCount,data.tableParameter.bMaxLost,
-            data.tableParameter.bYiWuShi,data.tableParameter.bLiangPai,data.tableParameter.bCanHuXi,data.tableParameter.bHuType,
-            data.tableParameter.bFangPao,data.tableParameter.bSettlement,data.tableParameter.bStartTun,data.tableParameter.bSocreType,
-            data.tableParameter.dwMingTang,data.tableParameter.bTurn,data.tableParameter.bDeathCard,data.tableParameter.bStartBanker)
-
-    elseif data.wKindID == 48 then
-        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbwbbbbbbbbdbbbbbbbb",
-            data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
-            data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,data.antiCell,32,data.szParameterName,
-            data.tableParameter.FanXing.bType,data.tableParameter.FanXing.bCount,data.tableParameter.FanXing.bAddTun,
-            data.tableParameter.bPlayerCountType,data.tableParameter.bPlayerCount,data.tableParameter.bLaiZiCount,data.tableParameter.bMaxLost,
-            data.tableParameter.bYiWuShi,data.tableParameter.bLiangPai,data.tableParameter.bCanHuXi,data.tableParameter.bHuType,
-            data.tableParameter.bFangPao,data.tableParameter.bSettlement,data.tableParameter.bStartTun,data.tableParameter.bSocreType,
-            data.tableParameter.dwMingTang,data.tableParameter.bTurn,data.tableParameter.bPaoTips,data.tableParameter.bStartBanker,
-            data.tableParameter.bSiQiHong,data.tableParameter.bDelShuaHou,data.tableParameter.bHuangFanAddUp,data.tableParameter.bTingHuAll,
-            data.tableParameter.bDeathCard)
-
-    elseif data.wKindID == 49 then
         NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbwbbbbbbbbdbbbbb",
             data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
             data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,data.antiCell,32,data.szParameterName,
@@ -955,7 +954,30 @@ function NewClubPlayWayInfoLayer:sendSetPlayWay(data)
             data.tableParameter.bYiWuShi,data.tableParameter.bLiangPai,data.tableParameter.bCanHuXi,data.tableParameter.bHuType,
             data.tableParameter.bFangPao,data.tableParameter.bSettlement,data.tableParameter.bStartTun,data.tableParameter.bSocreType,
             data.tableParameter.dwMingTang,data.tableParameter.bTurn,data.tableParameter.bDeathCard,data.tableParameter.bStartBanker,
-            data.tableParameter.bHuangFanAddUp,data.tableParameter.STWK)
+            data.tableParameter.bHostedTime,data.tableParameter.bHostedSession)
+
+    elseif data.wKindID == 48 then
+        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbwbbbbbbbbdbbbbbbbbbb",
+            data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
+            data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,data.antiCell,32,data.szParameterName,
+            data.tableParameter.FanXing.bType,data.tableParameter.FanXing.bCount,data.tableParameter.FanXing.bAddTun,
+            data.tableParameter.bPlayerCountType,data.tableParameter.bPlayerCount,data.tableParameter.bLaiZiCount,data.tableParameter.bMaxLost,
+            data.tableParameter.bYiWuShi,data.tableParameter.bLiangPai,data.tableParameter.bCanHuXi,data.tableParameter.bHuType,
+            data.tableParameter.bFangPao,data.tableParameter.bSettlement,data.tableParameter.bStartTun,data.tableParameter.bSocreType,
+            data.tableParameter.dwMingTang,data.tableParameter.bTurn,data.tableParameter.bPaoTips,data.tableParameter.bStartBanker,
+            data.tableParameter.bSiQiHong,data.tableParameter.bDelShuaHou,data.tableParameter.bHuangFanAddUp,data.tableParameter.bTingHuAll,
+            data.tableParameter.bDeathCard,data.tableParameter.bHostedTime,data.tableParameter.bHostedSession)
+
+    elseif data.wKindID == 49 then
+        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbwbbbbbbbbdbbbbbbb",
+            data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
+            data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,data.antiCell,32,data.szParameterName,
+            data.tableParameter.FanXing.bType,data.tableParameter.FanXing.bCount,data.tableParameter.FanXing.bAddTun,
+            data.tableParameter.bPlayerCountType,data.tableParameter.bPlayerCount,data.tableParameter.bLaiZiCount,data.tableParameter.bMaxLost,
+            data.tableParameter.bYiWuShi,data.tableParameter.bLiangPai,data.tableParameter.bCanHuXi,data.tableParameter.bHuType,
+            data.tableParameter.bFangPao,data.tableParameter.bSettlement,data.tableParameter.bStartTun,data.tableParameter.bSocreType,
+            data.tableParameter.dwMingTang,data.tableParameter.bTurn,data.tableParameter.bDeathCard,data.tableParameter.bStartBanker,
+            data.tableParameter.bHuangFanAddUp,data.tableParameter.STWK,data.tableParameter.bHostedTime,data.tableParameter.bHostedSession)
 
     elseif data.wKindID == 50 then
         NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbbbbbbbbb",
@@ -968,7 +990,7 @@ function NewClubPlayWayInfoLayer:sendSetPlayWay(data)
             data.tableParameter.mZTSXlag,data.tableParameter.bJJHFlag,data.tableParameter.bWuTong,data.tableParameter.mMaOne)
 
     elseif data.wKindID == 70 then
-        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbbbbbbbbbbb",
+        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbbbbbbbbbbbbb",
             data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
             data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,data.antiCell,32,data.szParameterName,
             data.tableParameter.bPlayerCount,
@@ -976,7 +998,7 @@ function NewClubPlayWayInfoLayer:sendSetPlayWay(data)
             data.tableParameter.bWJHFlag,data.tableParameter.bDSXFlag,data.tableParameter.bBBGFlag,data.tableParameter.bSTFlag,
             data.tableParameter.bYZHFlag,data.tableParameter.bMQFlag,data.tableParameter.mZXFlag,data.tableParameter.mPFFlag,
             data.tableParameter.mZTSXlag,data.tableParameter.bJJHFlag,data.tableParameter.bWuTong,data.tableParameter.mMaOne,
-            data.tableParameter.mZTLLSFlag,data.tableParameter.mKGNPFlag)
+            data.tableParameter.mZTLLSFlag,data.tableParameter.mKGNPFlag,data.tableParameter.bHostedTime,data.tableParameter.bHostedSession)
 
     elseif data.wKindID == 51 or data.wKindID == 55 or data.wKindID == 56 or data.wKindID == 57 or data.wKindID == 58 or data.wKindID == 59 then
         NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbbbbb",

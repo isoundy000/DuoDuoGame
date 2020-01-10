@@ -472,14 +472,14 @@ function SportsCreateLayer:createSports()
             self.settingsData.tableParameter.mZTSXlag,self.settingsData.tableParameter.bJJHFlag,self.settingsData.tableParameter.bWuTong,self.settingsData.tableParameter.mMaOne)   
 
     elseif self.settingsData.wKindID == 70 then
-        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_SPORTS,NetMsgId.REQ_SPORTS_CREATE,"ddbdwbbbbbbbbbbbbbbbbbbbb",
+        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_SPORTS,NetMsgId.REQ_SPORTS_CREATE,"ddbdwbbbbbbbbbbbbbbbbbbbbbb",
             CHANNEL_ID,self.sportsData.dwKey,1,dwCost,self.settingsData.wKindID,self.settingsData.tableParameter.bPlayerCount,
             self.settingsData.tableParameter.bPlayerCount,
             self.settingsData.tableParameter.bNiaoAdd,self.settingsData.tableParameter.mNiaoCount,self.settingsData.tableParameter.bLLSFlag,self.settingsData.tableParameter.bQYSFlag,
             self.settingsData.tableParameter.bWJHFlag,self.settingsData.tableParameter.bDSXFlag,self.settingsData.tableParameter.bBBGFlag,self.settingsData.tableParameter.bSTFlag,
             self.settingsData.tableParameter.bYZHFlag,self.settingsData.tableParameter.bMQFlag,self.settingsData.tableParameter.mZXFlag,self.settingsData.tableParameter.mPFFlag,
             self.settingsData.tableParameter.mZTSXlag,self.settingsData.tableParameter.bJJHFlag,self.settingsData.tableParameter.bWuTong,self.settingsData.tableParameter.mMaOne,
-            self.settingsData.tableParameter.mZTLLSFlag,self.settingsData.tableParameter.mKGNPFlag)   
+            self.settingsData.tableParameter.mZTLLSFlag,self.settingsData.tableParameter.mKGNPFlag,self.tableParameter.bHostedTime,self.tableParameter.bHostedSession)   
 
     elseif self.settingsData.wKindID == 51 or self.settingsData.wKindID == 55 or self.settingsData.wKindID == 56 or self.settingsData.wKindID == 57 or self.settingsData.wKindID == 58 or self.settingsData.wKindID == 59 then
         NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_SPORTS,NetMsgId.REQ_SPORTS_CREATE,"ddbdwbbbbbbbbbbbbbb",
