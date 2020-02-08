@@ -351,7 +351,24 @@ function GameConfig:getParameter(wKindID,luaFunc)
         data.bHostedTime = luaFunc:readRecvByte()               --托管时间
         data.bHostedSession = luaFunc:readRecvByte()                 --托管局数 
         haveReadByte = 21    --已读长度，每次增加或者减少都要修改该值，Byte1个字节 WORD2个字节 DWORD4个字节
-           
+    elseif wKindID == 78 then
+        data.bPlayerCount = luaFunc:readRecvByte()          -- //参与游戏的人数
+        data.mLaiZiCount = luaFunc:readRecvByte()           -- //0.无红中  1.四红中   2.八红中  （默认四红中）
+        data.bJiePao = luaFunc:readRecvByte()               -- //是否接炮(点炮胡)  0.不接炮 1.接炮
+        data.bQiDui = luaFunc:readRecvByte()                -- //七对玩法  0.不  1.是
+        data.bQGHu = luaFunc:readRecvByte()                 -- //是否抢杠胡  0.不抢杠胡 1.抢杠胡
+        data.bQGHuBaoPei = luaFunc:readRecvByte()           -- //是否抢杠胡包赔  0.不包赔（勾选）  1.包赔（不勾选）  默认包赔
+        data.bJiaPiao = luaFunc:readRecvByte()              -- //充分    0.不飘     1.飘一   2.飘二   3.选一次漂    4.每小局选漂<发牌前飘分>
+        data.bMaType = luaFunc:readRecvByte()               -- //1.一五九、2.抓鸟、3.一马全中、4.不奖马 5.摸几奖几、6.翻几奖几
+        data.bMaCount = luaFunc:readRecvByte()              --//马数 2、4、6
+        data.mNiaoType = luaFunc:readRecvByte()             --//1.一鸟一分、2.一鸟两分
+        data.mHongNiao = luaFunc:readRecvByte()             --//1.无红中加一码、0.无	
+        data.bWuTong = luaFunc:readRecvByte()               --//1.有筒  0.无筒 (默认有筒)
+        data.bFirstZhuang = luaFunc:readRecvByte()          --//1.首局随机庄家
+
+        data.bHostedTime = luaFunc:readRecvByte()                 --托管时间
+        data.bHostedSession = luaFunc:readRecvByte()                 --托管局数
+        haveReadByte = 15       
     elseif wKindID == 51 or wKindID == 55 or wKindID == 56 or wKindID == 57 or wKindID == 58 or wKindID == 59 then
         data.bPlayerCount = luaFunc:readRecvByte()
         data.bBankerType = luaFunc:readRecvByte()

@@ -189,7 +189,7 @@ function NewClubDefendLayer:research()
 		self.defendIndex = 1
 		self.defendState = 0
 		self.curSelUserID = UserData.User.userID
-		self.curTargetID = tonumber(self.TextField_memId:getString()) or 0
+		self.curTargetID = 0
 		UserData.Guild:getClubAntiMemberInfo(self.clubData.dwClubID, self.curSelUserID, 1, self.curTargetID, self.beganTime, self.endTime, self.defendIndex)
 
 	elseif self.curDefendPage == 5 then
@@ -197,7 +197,7 @@ function NewClubDefendLayer:research()
 		self.defendIndex = 1
 		self.defendState = 0
 		self.curSelUserID = UserData.User.userID
-		self.curTargetID = tonumber(self.TextField_memId:getString()) or 0
+		self.curTargetID = 0
 		UserData.Guild:getClubAntiMemberInfo(self.clubData.dwClubID, self.curSelUserID, 5, self.curTargetID, self.beganTime, self.endTime, self.defendIndex)
 
 	elseif self.curDefendPage == 6 then
@@ -205,7 +205,7 @@ function NewClubDefendLayer:research()
 		self.defendIndex = 1
 		self.defendState = 0
 		self.curSelUserID = UserData.User.userID
-		self.curTargetID = tonumber(self.TextField_memId:getString()) or 0
+		self.curTargetID = 0
 		UserData.Guild:getClubAntiMemberInfo(self.clubData.dwClubID, self.curSelUserID, 6, self.curTargetID, self.beganTime, self.endTime, self.defendIndex)
 	end
 end
@@ -225,7 +225,7 @@ function NewClubDefendLayer:onFindMem()
 		self.curSelUserID = UserData.User.userID
 		self.curTargetID = dwUserID
 		UserData.Guild:getClubAntiMemberInfo(self.clubData.dwClubID, self.curSelUserID, 0, self.curTargetID, 0, 0, self.defendIndex)
-	elseif self.curDefendPage == 3 then
+	elseif self.curDefendPage == 2 then
 		self.ListView_refreshList:removeAllItems()
 		self.defendIndex = 1
 		self.defendState = 0

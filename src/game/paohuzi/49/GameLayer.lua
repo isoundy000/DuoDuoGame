@@ -940,7 +940,7 @@ function GameLayer:OnGameMessageRun(_tagMsg)
             local uiPanel_showEndCard = ccui.Helper:seekWidgetByName(self.root,"Panel_showEndCard")
             GameCommon.uiPanel_showEndCard = uiPanel_showEndCard
             uiPanel_showEndCard:setOpacity(0)
-            uiPanel_showEndCard:runAction(cc.FadeIn:create(3))
+            uiPanel_showEndCard:runAction(cc.FadeIn:create(1))
             -- for i = 1, 2 do
             --     if pBuffer.fanXing[i].cbShengCard ~= 0 then
             --         self.tableLayer:runAction(cc.Sequence:create(cc.DelayTime:create(1.8),cc.CallFunc:create(function(sender,event) 
@@ -954,7 +954,7 @@ function GameLayer:OnGameMessageRun(_tagMsg)
             uiPanel_end:stopAllActions()
             if pBuffer.wWinUser ~= GameCommon.INVALID_CHAIR then
                 uiPanel_end:runAction(cc.Sequence:create(
-                    cc.DelayTime:create(4),
+                    cc.DelayTime:create(2),
                     cc.CallFunc:create(function(sender,event) 
                     if GameCommon.tableConfig.nTableType == TableType_SportsRoom then
                         pBuffer.wKindID =GameCommon.tableConfig.wKindID

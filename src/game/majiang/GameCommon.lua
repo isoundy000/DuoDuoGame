@@ -242,6 +242,10 @@ local GameCommon = {
     -------------------------------------------------------------------------------
     number_dwHorse = 0,                 --扎鸟数  
     meChairID = 0,
+
+    --漂分
+    wPiaoTF = {};
+    wPiaoCount = {};
 }
 
 function GameCommon:init()

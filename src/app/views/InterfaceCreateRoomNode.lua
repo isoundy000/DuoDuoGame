@@ -376,7 +376,12 @@ function InterfaceCreateRoomNode:SUB_GR_LOGON_SUCCESS(event)
                 self.tableParameter.bYZHFlag,self.tableParameter.bMQFlag,self.tableParameter.mZXFlag,self.tableParameter.mPFFlag,
                 self.tableParameter.mZTSXlag,self.tableParameter.bJJHFlag,self.tableParameter.bWuTong,self.tableParameter.mMaOne,
                 self.tableParameter.mZTLLSFlag,self.tableParameter.mKGNPFlag,self.tableParameter.bHostedTime,self.tableParameter.bHostedSession)   
-            
+    elseif self.wKindID == 78 then
+        NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbbbbbbbbbb",
+            CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,
+            self.tableParameter.bPlayerCount, self.tableParameter.mLaiZiCount, self.tableParameter.bJiePao,self.tableParameter.bQiDui, self.tableParameter.bQGHu, 
+            self.tableParameter.bQGHuBaoPei, self.tableParameter.bJiaPiao, self.tableParameter.bMaType, self.tableParameter.bMaCount, self.tableParameter.mNiaoType, 
+            self.tableParameter.mHongNiao, self.tableParameter.bWuTong,self.tableParameter.bFirstZhuang,self.tableParameter.bHostedTime,self.tableParameter.bHostedSession)         
     elseif self.wKindID == 51 or self.wKindID == 55 or self.wKindID == 56 or self.wKindID == 57 or self.wKindID == 58 or self.wKindID == 59 then
         NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_GR_CREATE_TABLE,"diwwwwdbbbbbbbbbbbbb",
             CHANNEL_ID,self.nTableType,self.wTableSubType,self.wKindID,self.wGameCount,1,self.dwTargetID,

@@ -999,7 +999,13 @@ function NewClubPlayWayInfoLayer:sendSetPlayWay(data)
             data.tableParameter.bYZHFlag,data.tableParameter.bMQFlag,data.tableParameter.mZXFlag,data.tableParameter.mPFFlag,
             data.tableParameter.mZTSXlag,data.tableParameter.bJJHFlag,data.tableParameter.bWuTong,data.tableParameter.mMaOne,
             data.tableParameter.mZTLLSFlag,data.tableParameter.mKGNPFlag,data.tableParameter.bHostedTime,data.tableParameter.bHostedSession)
-
+    elseif data.wKindID == 78 then
+        NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbbbbbbb",
+            data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,
+            data.cbMode,data.payMode,data.payLimit1,data.payCount1,data.payLimit2,data.payCount2,data.payLimit3,data.payCount3,data.isPercentage,data.tableLimit,data.fatigueCell,data.isTableCharge,data.fatigueLimit,data.antiCell,32,data.szParameterName,
+            data.tableParameter.bPlayerCount, data.tableParameter.mLaiZiCount, data.tableParameter.bJiePao,data.tableParameter.bQiDui, data.tableParameter.bQGHu, 
+            data.tableParameter.bQGHuBaoPei, data.tableParameter.bJiaPiao, data.tableParameter.bMaType, data.tableParameter.bMaCount, data.tableParameter.mNiaoType, 
+            data.tableParameter.mHongNiao, data.tableParameter.bWuTong,data.tableParameter.bFirstZhuang,data.tableParameter.bHostedTime,data.tableParameter.bHostedSession)  
     elseif data.wKindID == 51 or data.wKindID == 55 or data.wKindID == 56 or data.wKindID == 57 or data.wKindID == 58 or data.wKindID == 59 then
         NetMgr:getLogicInstance():sendMsgToSvr(NetMsgId.MDM_CL_CLUB,NetMsgId.REQ_SETTINGS_CLUB_PLAY,"bddwwwbbddddddolwolwnsbbbbbbbbbbbbb",
             data.settype,data.dwClubID,data.playid,data.wKindID,data.wGameCount,1,

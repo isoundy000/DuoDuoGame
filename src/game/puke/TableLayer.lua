@@ -826,6 +826,19 @@ function TableLayer:initUI()
         end)
     end
 
+    --详情
+    local uiButton_Details = ccui.Helper:seekWidgetByName(self.root,"Button_Details")
+    if uiButton_Details ~= nil then 
+        local uiText_desc = ccui.Helper:seekWidgetByName(self.root,"Text_desc")    
+        Common:addTouchEventListener(uiButton_Details,function() 
+            if uiText_desc:isVisible() then 
+                uiText_desc:setVisible(false)
+            else
+                uiText_desc:setVisible(true)
+            end 
+        end)
+    end 
+
     --结算层
     local uiPanel_end = ccui.Helper:seekWidgetByName(self.root,"Panel_end")
     uiPanel_end:setVisible(false)
@@ -965,6 +978,8 @@ function TableLayer:updateGameState(state)
     local visibleSize = cc.Director:getInstance():getVisibleSize()
     if state == GameCommon.GameState_Init then
     elseif state == GameCommon.GameState_Start then
+        local uiText_desc = ccui.Helper:seekWidgetByName(self.root,"Text_desc")    
+        uiText_desc:setVisible(false)  
 		require("common.SceneMgr"):switchOperation()
         local uiPanel_playerInfoBg = ccui.Helper:seekWidgetByName(self.root,"Panel_playerInfoBg")
         uiPanel_playerInfoBg:setVisible(false)

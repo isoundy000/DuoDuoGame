@@ -307,6 +307,111 @@ function GameDesc:getGameDesc(wKindID,data,tableConfig)
         if data.bWuTong == 0 then
             desc = desc.."/去掉筒子"
         end
+    elseif wKindID == 78 then
+        if data.bPlayerCount == 2 then
+            desc = desc.."双人竞技"
+            if data.bWuTong == 0 then                       --//1.有筒  0.无筒 (默认有筒)
+                desc = desc.."/无筒"
+            elseif data.bWuTong == 1 then
+                desc = desc.."/有筒"
+            end
+        elseif data.bPlayerCount == 3 then
+            desc = desc.."3人"
+        elseif data.bPlayerCount == 4 then
+            desc = desc.."4人"
+        end
+
+        if data.mLaiZiCount == 1 then
+            desc = desc.."/四红中"
+        elseif data.mLaiZiCount == 2 then
+            desc = desc.."/八红中"
+        else
+            desc = desc.."/无红中"
+        end
+        if data.bJiePao == 0 then
+            desc = desc.."/不接炮"
+        elseif data.bJiePao == 1 then
+            desc = desc.."/接炮"
+        end
+        if data.bQiDui == 1 then
+            desc = desc.."/七对"
+        end
+        if data.bQGHu == 0 then             -- //是否抢杠胡  0.不抢杠胡 1.抢杠胡
+            desc = desc.."/不抢杠胡"
+        elseif data.bQGHu == 1 then
+            desc = desc.."/抢杠胡"
+        end        
+        if data.bQGHuBaoPei == 1 then       -- //是否抢杠胡包赔  1.不包赔（勾选）  0.包赔（不勾选）  默认包赔
+            desc = desc.."/不包赔"
+        elseif data.bQGHuBaoPei == 0 then
+            desc = desc.."/抢杠胡包赔"
+        end
+        if data.bJiaPiao == 0 then          -- //充分    0.不飘     1.飘一   2.飘二   3.选一次漂    4.每小局选漂<发牌前飘分>
+            desc = desc.."/不充"
+        elseif data.bJiaPiao == 1 then
+            desc = desc.."/充一"
+        elseif data.bJiaPiao == 2 then
+            desc = desc.."/充二"
+        elseif data.bJiaPiao == 3 then
+            desc = desc.."/选一次充"
+        elseif data.bJiaPiao == 4 then
+            desc = desc.."/每小局充分"
+        end
+        if data.bMaType == 1 then           -- //1.一五九、2.抓鸟、3.一码全中、4.不奖码 5.摸几奖几、6.翻几奖几
+            desc = desc.."/一五九"
+        elseif data.bMaType == 2 then
+            desc = desc.."/抓鸟"
+        elseif data.bMaType == 3 then
+            desc = desc.."/一码全中"
+        elseif data.bMaType == 4 then
+            desc = desc.."/不奖码"
+        elseif data.bMaType == 5 then
+            desc = desc.."摸几奖几"        
+        elseif data.bMaType == 6 then
+            desc = desc.."/翻几奖几"
+        end
+        if data.bMaCount == 2 then                    --//马数 2、4、6
+            desc = desc.."/2个码"
+        elseif data.bMaCount == 4 then
+            desc = desc.."/4个码"
+        elseif data.bMaCount == 6 then
+            desc = desc.."/6个码"
+        elseif data.bMaCount == 8 then
+            desc = desc.."/8个码"
+        end
+        if data.mNiaoType == 1 then                  --//1.一鸟一分、2.一鸟两分
+            desc = desc.."/一鸟一分"
+        elseif data.mNiaoType == 2 then
+            desc = desc.."/一鸟两分"
+        end
+        if data.mHongNiao == 0 then                        --//1.无红中加一码、0.无	
+            --desc = desc.."/不接炮"
+        elseif data.mHongNiao == 1 then
+            desc = desc.."/红中加一码"
+        end
+        if data.bFirstZhuang == 1 then
+            desc = desc.."/首局随机做庄"
+        end
+
+        if data.bHostedTime == 1 then
+            desc = desc.."/一分钟托管"
+        elseif data.bHostedTime == 2 then
+            desc = desc.."/两分钟托管"
+        elseif data.bHostedTime == 3 then
+            desc = desc.."/三分钟托管"
+        elseif data.bHostedTime == 5 then
+            desc = desc.."/五分钟托管"
+        elseif data.bHostedTime == 0 then
+            desc = desc.."/无托管"
+        end
+
+        if data.bHostedSession == 1 then
+            desc = desc.."/单局托管"
+        elseif data.bHostedSession == 3 then
+            desc = desc.."/三局托管"
+        elseif data.bHostedSession >= 6 then
+            desc = desc.."/全局托管"
+        end
 
     elseif wKindID == 70 then         
         if data.bPlayerCount == 2 then

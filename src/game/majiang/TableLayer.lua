@@ -1512,7 +1512,7 @@ end
 -------------------------------------------------------手牌-----------------------------------------------------
 --设置手牌
 function TableLayer:setHandCard(wChairID,cbCardCount,cbCardData)
-    if GameCommon.tableConfig.wKindID == 45 or GameCommon.tableConfig.wKindID == 68 or GameCommon.tableConfig.wKindID == 63 or  GameCommon.tableConfig.wKindID == 67  then
+    if GameCommon.tableConfig.wKindID == 78 or GameCommon.tableConfig.wKindID == 68 or GameCommon.tableConfig.wKindID == 63 or  GameCommon.tableConfig.wKindID == 67  then
         local isAllHongZhong = true
         for i = 1, cbCardCount do
             if cbCardData[i] ~= 0x31 then
@@ -1592,13 +1592,13 @@ function TableLayer:addOneHandCard(wChairID, cbCard, pos)
     local viewID = GameCommon:getViewIDByChairID(wChairID)
     local uiPanel_handCard = ccui.Helper:seekWidgetByName(self.root,string.format("Panel_handCard%d",viewID))
     --插入手牌中
-    if (GameCommon.tableConfig.wKindID == 45 or GameCommon.tableConfig.wKindID == 68 or GameCommon.tableConfig.wKindID == 63 or  GameCommon.tableConfig.wKindID == 67) and cbCard == 0x31 then
+    if (GameCommon.tableConfig.wKindID == 78 or GameCommon.tableConfig.wKindID == 68 or GameCommon.tableConfig.wKindID == 63 or  GameCommon.tableConfig.wKindID == 67) and cbCard == 0x31 then
         --红中麻将，红中放左边
         table.insert(GameCommon.player[wChairID].cbCardData,1,cbCard)
     else
         local isInsert = false
         for i = 1, GameCommon.player[wChairID].cbCardCount do
-            if cbCard < GameCommon.player[wChairID].cbCardData[i] and((GameCommon.tableConfig.wKindID ~= 45 and GameCommon.tableConfig.wKindID ~= 68  and GameCommon.tableConfig.wKindID ~= 63 and   GameCommon.tableConfig.wKindID ~= 67) or GameCommon.player[wChairID].cbCardData[i] ~= 0x31) then
+            if cbCard < GameCommon.player[wChairID].cbCardData[i] and((GameCommon.tableConfig.wKindID ~= 78 and GameCommon.tableConfig.wKindID ~= 68  and GameCommon.tableConfig.wKindID ~= 63 and   GameCommon.tableConfig.wKindID ~= 67) or GameCommon.player[wChairID].cbCardData[i] ~= 0x31) then
                 table.insert(GameCommon.player[wChairID].cbCardData,i,cbCard)
                 isInsert = true
                 break
@@ -1635,7 +1635,7 @@ function TableLayer:addOneHandCard(wChairID, cbCard, pos)
         data.pt = cc.p(size.width/2,size.height + 15)
     end
     data.node = nil
-    if (GameCommon.tableConfig.wKindID == 45 or GameCommon.tableConfig.wKindID == 68 ) and cbCard == 0x31 then
+    if (GameCommon.tableConfig.wKindID == 78 or GameCommon.tableConfig.wKindID == 68 ) and cbCard == 0x31 then
         table.insert(GameCommon.player[wChairID].cardNode,1,data)
     elseif GameCommon.tableConfig.wKindID == 63 and cbCard == 0x31 then
         table.insert(GameCommon.player[wChairID].cardNode,1,data)
@@ -1644,7 +1644,7 @@ function TableLayer:addOneHandCard(wChairID, cbCard, pos)
     else
         local isInsert = false
         for key, var in pairs(GameCommon.player[wChairID].cardNode) do
-            if cbCard < var.data and ((GameCommon.tableConfig.wKindID ~= 45 and GameCommon.tableConfig.wKindID ~= 68  and GameCommon.tableConfig.wKindID ~= 63 and GameCommon.tableConfig.wKindID ~= 67 ) or var.data ~= 0x31) then
+            if cbCard < var.data and ((GameCommon.tableConfig.wKindID ~= 78 and GameCommon.tableConfig.wKindID ~= 68  and GameCommon.tableConfig.wKindID ~= 63 and GameCommon.tableConfig.wKindID ~= 67 ) or var.data ~= 0x31) then
                 table.insert(GameCommon.player[wChairID].cardNode,key,data) 
                 isInsert = true
                 break
@@ -2166,7 +2166,9 @@ function TableLayer:initUI()
         end)
     end
     
-    
+    --78飘分
+    local uiPanel_piaoFen78 = ccui.Helper:seekWidgetByName(self.root,"Panel_piaoFen78")
+    uiPanel_piaoFen78:setVisible(false)   
     --买飘
     local uiPanel_maipiao = ccui.Helper:seekWidgetByName(self.root,"Panel_maipiao")
     uiPanel_maipiao:setVisible(false)
@@ -2803,7 +2805,7 @@ function TableLayer:huCardUpShow(data)
             end 
         -- end         
     end  
-    if GameCommon.tableConfig.wKindID == 45 or GameCommon.tableConfig.wKindID == 68 or GameCommon.tableConfig.wKindID == 63 or GameCommon.tableConfig.wKindID == 67 then
+    if GameCommon.tableConfig.wKindID == 78 or GameCommon.tableConfig.wKindID == 68 or GameCommon.tableConfig.wKindID == 63 or GameCommon.tableConfig.wKindID == 67 then
         local  card = GameCommon:GetHUCard(0x31)
         card:setScale(0.6)  
         if #GameCommon.mBTHuCard[data] >18  then        
@@ -3692,6 +3694,25 @@ function TableLayer:updatePaijuInfo( )
     local Text_majiang_roomnum = ccui.Helper:seekWidgetByName(self.root,"Text_majiang_roomnum")
     Text_majiang_roomnum:setString(GameCommon.tableConfig.wTbaleID)
     local a = 1
+end
+
+
+function TableLayer:addClickItem()
+    local Panel_piaoFen78 = ccui.Helper:seekWidgetByName(self.root,"Panel_piaoFen78")
+    local childs = {}
+    for i=1,3 do
+        local child = ccui.Helper:seekWidgetByName(Panel_piaoFen78,(i-1))
+        Common:addTouchEventListener(child,function() 
+            local index= child:getName()
+            print('--xx',index)
+            -- if GameCommon.tableConfig.wKindID == 80 then
+            --     NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_PiaoFen,"b",tonumber(index))
+            -- else
+                NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GF_GAME,NetMsgId.SUB_C_JiaPiao,"b",tonumber(index))
+            -- end
+        end)  --SUB_C_PiaoFen
+        table.insert(childs,child)
+    end
 end
 
 return TableLayer

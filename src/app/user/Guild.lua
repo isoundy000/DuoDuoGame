@@ -871,6 +871,10 @@ function Guild:EVENT_TYPE_NET_RECV_MESSAGE(event)
         data.dwDistributionRatio = luaFunc:readRecvDWORD()
         data.dwPartnerLevel = luaFunc:readRecvDWORD()
         data.lScorePoint = luaFunc:readRecvLong() / 100
+        data.lFatigueTotal = luaFunc:readRecvLong() / 100
+        data.dwSuperiorID = luaFunc:readRecvDWORD()
+        data.szSuperiorNickName = luaFunc:readRecvString(32)
+        data.dwTargetPartnerID = luaFunc:readRecvDWORD()
 
         EventMgr:dispatch(EventType.RET_GET_CLUB_PARTNER, data)
 
@@ -1566,9 +1570,8 @@ end
 
 --请求俱乐部成员疲劳值记录
 function Guild:getClubFatigueRecord(dwClubID, dwUserID, wPage, bType, dwBeganTime, dwEndTime)
-    if not dwUserID then
-        return
-    end
+    local UserData = require("app.user.UserData")
+    dwUserID = dwUserID or UserData.User.userID
     bType = bType or 0
     dwBeganTime = dwBeganTime or 0
     dwEndTime = dwEndTime or 0

@@ -259,11 +259,13 @@ function NewClubPartnerLayer:onFindMem()
     elseif self.curPartnerPage == 4 then
         local dwUserID = tonumber(self.TextField_memId:getString())
         if dwUserID then
-            local dwMinWinnerScore = 0
+            -- local dwMinWinnerScore = 0
+            self.curPartnerIdx = 1
             self.pCurID = dwUserID
-            UserData.Guild:findPartnerMember(self.clubData.dwClubID,dwUserID,dwUserID,self.beganTime,self.endTime,dwMinWinnerScore)
+            -- UserData.Guild:findPartnerMember(self.clubData.dwClubID,dwUserID,dwUserID,self.beganTime,self.endTime,dwMinWinnerScore)
+            self:reqClubPartner(self.pCurID)
         else
-            require("common.MsgBoxLayer"):create(0,nil,"输入格式错误！")
+            require("common.MsgBoxLayer"):create(0,nil,"玩家ID错误！")
         end
     elseif self.curPartnerPage == 6 then
 	    local dwUserID = tonumber(self.TextField_memId:getString())
@@ -992,6 +994,19 @@ function NewClubPartnerLayer:RET_GET_CLUB_PARTNER(event)
     dump(data)
     if data.lRet ~= 0 then
         require("common.MsgBoxLayer"):create(0,nil,"您还不是合伙人!")
+        return
+    end
+
+    if self.curPartnerPage == 4 and data.dwTargetPartnerID ~= 0 then
+        if data.dwUserID == 0 then
+            require("common.MsgBoxLayer"):create(0,nil,"合伙人不存在!")
+        else
+            self.ListView_myPartner:setVisible(false)
+            self.ListView_findMyPartner:setVisible(true)
+            self.Button_findMem:setVisible(false)
+            self.Button_findMemReturn:setVisible(true)
+            self:insertMyPartnerItme(data)
+        end
         return
     end
 

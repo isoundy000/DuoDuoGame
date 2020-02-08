@@ -1891,7 +1891,20 @@ function TableLayer:initUI()
             NetMgr:getGameInstance():sendMsgToSvr(NetMsgId.MDM_GR_USER,NetMsgId.REQ_USER_HOSTED,"o",false)
         end)
     end    
-  
+
+    --详情
+    local uiButton_Details = ccui.Helper:seekWidgetByName(self.root,"Button_Details")
+    if uiButton_Details ~= nil then 
+        local uiText_desc = ccui.Helper:seekWidgetByName(self.root,"Text_desc")    
+        Common:addTouchEventListener(uiButton_Details,function() 
+            if uiText_desc:isVisible() then 
+                uiText_desc:setVisible(false)
+            else
+                uiText_desc:setVisible(true)
+            end 
+        end)
+    end  
+
     --结算层
     local uiPanel_end = ccui.Helper:seekWidgetByName(self.root,"Panel_end")
     uiPanel_end:setVisible(false)
@@ -2128,7 +2141,9 @@ function TableLayer:updateGameState(state)
         uiPanel_playerInfoBg:setVisible(false)
         local uiPanel_ready = ccui.Helper:seekWidgetByName(self.root,"Panel_ready")
         uiPanel_ready:setVisible(false)
-        if GameCommon.tableConfig.nTableType > TableType_GoldRoom then                   
+        if GameCommon.tableConfig.nTableType > TableType_GoldRoom then     
+            local uiText_desc = ccui.Helper:seekWidgetByName(self.root,"Text_desc")    
+            uiText_desc:setVisible(false)     
             if GameCommon:judgeGame() or  CHANNEL_ID == 0 or CHANNEL_ID == 1 or CHANNEL_ID == 10 or CHANNEL_ID == 11 or CHANNEL_ID == 26 or CHANNEL_ID == 27  then 
                 local uiButton_out = ccui.Helper:seekWidgetByName(self.root,"Button_out")
                 local uiButton_disbanded = ccui.Helper:seekWidgetByName(self.root,"Button_disbanded")

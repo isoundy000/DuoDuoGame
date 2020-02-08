@@ -46,9 +46,11 @@ function DaiLiLayer:onCreate(parames)
         require("common.MsgBoxLayer"):create(0,nil,"复制成功！")
     end)
 
+    local uiText_1_1 = ccui.Helper:seekWidgetByName(self.root, "Text_1_1")
+    uiText_1_1:setString("微信公众号:  ddqp688")
     local Button_copy3 = ccui.Helper:seekWidgetByName(self.root,"Button_copy3")
     Common:addTouchEventListener(Button_copy3,function() 
-        UserData.User:copydata("18569457558") 
+        UserData.User:copydata("ddqp688") 
         require("common.MsgBoxLayer"):create(0,nil,"复制成功！")
     end)
 
