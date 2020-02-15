@@ -108,6 +108,15 @@ function RoomCreateLayer:onCreate(parameter)
                 if wKindID == locationID then
                     isFound = true
                 end
+                if  wKindID == 78 then 
+                    local uiText_OfflineTime = ccui.Text:create("0","fonts/DFYuanW7-GB2312.ttf","24")
+                    uiText_OfflineTime:setName('Text_OfflineTime')
+                    uiText_OfflineTime:setTextColor(cc.c3b(0,0,255)) 
+                    uiText_OfflineTime:setAnchorPoint(cc.p(0.5,0.5))
+                    item:addChild(uiText_OfflineTime,100)
+                    uiText_OfflineTime:setPosition(160,80)                
+                    uiText_OfflineTime:setString("八红中")     
+                end 
             end	
         end
         if isFound == true then

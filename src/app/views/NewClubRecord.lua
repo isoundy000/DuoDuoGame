@@ -93,7 +93,7 @@ function NewClubRecord:onCreate(params)
 	self.clubData = params[1]
 	self.clubID = self.clubData.dwClubID
 	self.isAdmin = params[2]
-	-- self.adminID = self.clubData.dwUserID
+	self.adminID = self.clubData.dwUserID
 	self.clubName = self.clubData.szClubName
 	self.isLoadStatics = false
 	self:initUI()
@@ -201,10 +201,10 @@ function NewClubRecord:onCallOtherReplay( ... )
 end
 
 function NewClubRecord:onClickTopRecord( sender )
-	-- if sender:getName() == 'Button_top_2' and not self.isAdmin then
-	-- 	require("common.MsgBoxLayer"):create(0,self,"您不是群主或管理员")
-	-- 	return
-	-- end
+	if sender:getName() == 'Button_top_2' and not self.isAdmin then
+		require("common.MsgBoxLayer"):create(0,self,"您不是群主或管理员")
+		return
+	end
 
 	if sender.isClick then
 		return
@@ -303,12 +303,12 @@ end
 
 function NewClubRecord:chageRecord( type_record )
 	self:changePage(Page_State.RECORD_PAGE)
-	-- if type_record == RECORD_TYPE.CLUB_RECORD then
-	-- 	if not self.isAdmin then
-	-- 		require("common.MsgBoxLayer"):create(0,self,"您不是群主或管理员")
-	-- 		return
-	-- 	end
-	-- end
+	if type_record == RECORD_TYPE.CLUB_RECORD then
+		if not self.isAdmin then
+			require("common.MsgBoxLayer"):create(0,self,"您不是群主或管理员")
+			return
+		end
+	end
 	self.isCanBottom = false
 	self.recordType = type_record
 	self:reqRecord(self.dayType,self.recordType)
@@ -491,7 +491,7 @@ function NewClubRecord:reqRecord( day_type,record_type )
 		local recordType = self:getServerTypRecord(record_type)
 		local id = UserData.User.userID
 		if record_type == RECORD_TYPE.CLUB_RECORD then --亲友圈场
-			id = UserData.User.userID --self.adminID
+			id = self.adminID
 		elseif record_type == RECORD_TYPE.PERSON_RECORD then --个人所在俱乐部
 			id = self.targetId or UserData.User.userID
 		end
@@ -628,8 +628,8 @@ function NewClubRecord:checkReq( dt )
 				local main = self:getEndMainID()
 				if main then
 					print('----分页请求普通房')
-					-- UserData.Record:sendMsgGetMainRecord(3, self.clubID, MAX_ITEM, tostring(main.szMainGameID),self.adminID,self.dayType) ----普通场
-					UserData.Record:sendMsgGetMainRecord(3, self.clubID, MAX_ITEM, tostring(main.szMainGameID),UserData.User.userID,self.dayType)
+					UserData.Record:sendMsgGetMainRecord(3, self.clubID, MAX_ITEM, tostring(main.szMainGameID),self.adminID,self.dayType) ----普通场
+					-- UserData.Record:sendMsgGetMainRecord(3, self.clubID, MAX_ITEM, tostring(main.szMainGameID),UserData.User.userID,self.dayType)
 				end 
 			end
 		end
