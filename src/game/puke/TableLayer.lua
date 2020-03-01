@@ -1462,7 +1462,7 @@ function TableLayer:tryAutoSendCard(wCurrentUser)
         self:showCountDown(wCurrentUser)
         return
     end
-    --如果上次出牌是其他人
+    --如果上次出牌是其他人 
     if self.lastOutCardInfo.wOutCardUser ~= wChairID then
         if #self.lastOutCardInfo.tableCard == 1 and #self.lastOutCardInfo.tableCard[1] == GameCommon.player[wChairID].bUserCardCount then
             local tabelCard = {}
@@ -1489,7 +1489,7 @@ function TableLayer:tryAutoSendCard(wCurrentUser)
                 table.insert(tabelCard,#tabelCard+1,GameCommon.player[wChairID].cbCardData[i])
             end
             self:sendCard(wChairID,tabelCard)
-            self:showCountDown(wCurrentUser,true)
+            self:showCountDown(wCurrentUser)--,true
             return
         end
     end

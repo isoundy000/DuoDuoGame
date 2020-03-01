@@ -409,7 +409,7 @@ function GameLayer:readBuffer(luaFunc, mainCmdID, subCmdID)
             if GameCommon.tableConfig.szTableName ~= nil and GameCommon.tableConfig.szTableName ~="" then  
                 local uiText_table = ccui.Helper:seekWidgetByName(self.root,"Text_table")
                 uiText_table:setString(GameCommon.tableConfig.szTableName)
-                local CellScore = GameCommon.tableConfig.wCellScore / GameCommon.tableConfig.wTableCellDenominator
+                --local CellScore = GameCommon.tableConfig.wCellScore / GameCommon.tableConfig.wTableCellDenominator
                 --uiText_table:setString(GameCommon.tableConfig.szTableName..string.format(" 倍率:%0.2f",CellScore))
             end 
             return true
@@ -436,7 +436,13 @@ function GameLayer:readBuffer(luaFunc, mainCmdID, subCmdID)
             _tagMsg.pBuffer.bNewTurn = luaFunc:readRecvBool()
             _tagMsg.pBuffer.wPassUser = luaFunc:readRecvWORD()
             _tagMsg.pBuffer.wCurrentUser = luaFunc:readRecvWORD()
-
+        elseif subCmdID == NetMsgId.SUB_S_BOMB_PDK then   
+            _tagMsg.pBuffer.wCurrentUser = luaFunc:readRecvWORD()   
+            _tagMsg.pBuffer.lBombScore = {}
+            for i=1,3 do
+                _tagMsg.pBuffer.lBombScore[i] = luaFunc:readRecvLong()
+                print("+++++++++++炸弹分数+++++",i,_tagMsg.pBuffer.lBombScore[i])
+            end
         elseif subCmdID == NetMsgId.SUB_S_WARN_INFO_PDK then
             _tagMsg.pBuffer.wWarnUser = luaFunc:readRecvWORD()
             _tagMsg.pBuffer.bWarn = luaFunc:readRecvByte()
@@ -450,7 +456,6 @@ function GameLayer:readBuffer(luaFunc, mainCmdID, subCmdID)
                 _tagMsg.pBuffer.bCardData[i] = luaFunc:readRecvByte()
             end
             
-
         elseif subCmdID == NetMsgId.SUB_S_GAME_END_PDK then
             _tagMsg.pBuffer.wWinUser = luaFunc:readRecvWORD()
             _tagMsg.pBuffer.lUserScore = {}
@@ -677,7 +682,9 @@ function GameLayer:OnGameMessageRun(_tagMsg)
             
         elseif subCmdID == NetMsgId.SUB_S_USER_PASS_CARD_PDK then
             self.tableLayer:doAction(NetMsgId.SUB_S_USER_PASS_CARD_PDK,pBuffer)
-                        
+
+        elseif subCmdID == NetMsgId.SUB_S_BOMB_PDK then     
+            self:runAction(cc.Sequence:create(cc.DelayTime:create(0),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))                
         elseif subCmdID == NetMsgId.SUB_S_WARN_INFO_PDK then
             self.tableLayer:doAction(NetMsgId.SUB_S_WARN_INFO_PDK,pBuffer)
             

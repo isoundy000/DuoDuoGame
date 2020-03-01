@@ -167,7 +167,7 @@ function NewClubInfoLayer:refreshCeil(index, ceil)
 	local items = ceil:getChildren()
 	local selectTable = cc.UserDefault:getInstance():getIntegerForKey('CurSelClubTable', 1)
 	for i,item in ipairs(items) do
-		local data = self.tableViewData[index*2 + i]
+		local data = self.tempTableViewCache[index*2 + i]
 		if not data then
 			item:setVisible(false)
 			break
@@ -389,12 +389,67 @@ function NewClubInfoLayer:getDataCount()
 	return math.ceil(self.tableViewLength / 2)
 end
 
+-- 获取桌子显示方式数量
+function NewClubInfoLayer:getTableShowTypeNum()
+	self.tempTableViewCache = clone(self.tableViewData) or {}
+
+	if not self.clubData then
+		return 0
+	end
+
+	if UserData.User.userID == self.clubData.dwUserID or self:isAdmin(UserData.User.userID) then
+        return #self.tableViewData
+    end
+
+	local count = 0
+	if Bit:_and(0x40, self.clubData.bIsDisable or 0) == 0x40 then
+		for i,v in ipairs(self.tableViewData or {}) do
+			if v.type == 2 then
+				if v.data.bIsGameStart then
+					-- 以开局
+					count = count + 1
+				end
+			end
+		end
+
+		local fullPeopleNum = math.floor(count * (1 - 0.2)) --只显示20%的以开局桌子数
+		local removeCount = 0
+		for i=#self.tempTableViewCache,1,-1 do
+			local v = self.tempTableViewCache[i]
+			if v.type == 2 then
+				local isSelfExist = false
+				for _,v in ipairs(v.data.dwUserID or {}) do
+					if v ~= 0 then
+						if v == UserData.User.userID then
+							isSelfExist = true
+						end
+					end
+				end
+				
+				if v.data.bIsGameStart and not isSelfExist then
+					-- 以开局
+					table.remove(self.tempTableViewCache, i)
+					removeCount = removeCount + 1
+					if removeCount >= fullPeopleNum then
+						break
+					end
+				end
+			end
+		end
+		count = #self.tableViewData - fullPeopleNum
+	else
+		count = #self.tableViewData
+	end
+	return count
+end
+
 function NewClubInfoLayer:onCreate(param)
     self.clubData = param[1]
 	self.Chat = UserData.Chat -- 俱乐部聊天信息
 	
 	--牌桌tableview
 	self.tableViewData = {}
+	self.tempTableViewCache = {}
 	self.isTableViewScrolling = false
 	local viewSize = cc.size(self.Panel_bg:getContentSize().width, 480)
 	self.listView = Common:_createList(viewSize, handler(self, self._itemUpdateCall), CellSize.width, CellSize.height, handler(self, self.getDataCount), nil, cc.SCROLLVIEW_DIRECTION_HORIZONTAL, nil, false)
@@ -407,7 +462,7 @@ function NewClubInfoLayer:onCreate(param)
 		if self.isTableViewRefresh then
 			self.isTableViewRefresh = false
 			local offset = self.listView:getContentOffset()
-			self.tableViewLength = #self.tableViewData
+			self.tableViewLength = self:getTableShowTypeNum()
 			self.listView:reloadData()
 			self.listView:setContentOffset(cc.p(offset.x, offset.y))
 		end

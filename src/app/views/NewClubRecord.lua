@@ -391,6 +391,7 @@ function NewClubRecord:createSubRecord( data )
 
 	local Button_look = item:getChildByName('Button_look')
 	Button_look:setName(data.szSubGameID)
+	self.szTableName = data.szTableName
 	self:addButtonEventListener(Button_look, handler(self, self.reBackPlay),true)
 	local Text_num = self:seekWidgetByNameEx(item,'Text_num')
 	Text_num:setString(count)
@@ -599,7 +600,9 @@ function NewClubRecord:updateChildItem( item,index )
 	local tableID = data.wServerID * 1000 + data.wTableID
 	Text_roomid:setString(tableID .. '房间')
 	local gameData = StaticData.Games[data.wKindID]
-	if gameData then
+	if data.szTableName ~= "" then
+		gameData = data.szTableName
+	elseif gameData then
 		gameData = gameData.name
 	end
 	Text_name:setString(gameData or '')
@@ -837,6 +840,7 @@ function NewClubRecord:enterGameRePlay(data)
 	tableConfig.wCellScore = 0
 	tableConfig.wTableNumber = 0
 	tableConfig.wCurrentNumber = 0
+	tableConfig.szTableName = self.szTableName
 	if StaticData.Games[self.wKindID].luaGameFile then
 		require("common.SceneMgr"):switchScene(require(StaticData.Games[self.wKindID].luaGameFile):create(tableConfig.dwUserID, tableConfig, data), SCENE_GAME)
 	else
