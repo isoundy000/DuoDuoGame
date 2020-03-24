@@ -38,7 +38,7 @@ if cc.PLATFORM_OS_DEVELOPER == PLATFORM_TYPE then
     IS_OPEN_UPDATE = false
 end
 
-cc.exports.CONST_ACCOUNTS = "duoduo01"
+cc.exports.CONST_ACCOUNTS = "oKOaiuPCkNv13QrNTP78_NOJVFO0"
 
 local searchPaths = cc.FileUtils:getInstance():getSearchPaths()
 local path = cc.FileUtils:getInstance():getWritablePath().."huyoo/"

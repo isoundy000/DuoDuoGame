@@ -81,6 +81,8 @@ end
 
 function NewClubPlayWayInfoLayer:onCreate(param)
 	Log.d(param[1])
+    self.isOS = PLATFORM_TYPE == cc.PLATFORM_OS_APPLE_REAL
+    self:createrInput()
 	self.clubData = param[1]
 	self.TextField_aaValue:setTextHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
 	self.TextField_criticalNum:setTextHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
@@ -89,10 +91,31 @@ function NewClubPlayWayInfoLayer:onCreate(param)
 	self.TextField_criticalNum:setTouchEnabled(false)
 	self.TextField_powerNum:setTouchEnabled(false)
 	self:initUI(self.clubData, param[2])
-    if CHANNEL_ID == 10 or CHANNEL_ID == 11 or CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+
+    if self.clubData.dwClubID == 359949 or self.clubData.dwClubID == 807113 or self.clubData.dwClubID == 110852 or self.clubData.dwClubID == 460861 then
         self.Image_goldMode:setVisible(true)
     else
         self.Image_goldMode:setVisible(false)
+    end
+end
+
+function NewClubPlayWayInfoLayer:createrInput( ... )
+    self.TextField_playway:setVisible(not self.isOS)
+
+    if self.isOS then
+        local parent = self.TextField_playway:getParent()
+        self.TextField_playway = ccui.EditBox:create(cc.size(380,40), "chat/newclub/club_27x.png")
+        self.TextField_playway:setPosition(parent:getContentSize().width / 2,parent:getContentSize().height / 2)
+        self.TextField_playway:setAnchorPoint(cc.p(0.5,0.5))
+        self.TextField_playway:setFontSize(30)
+        self.TextField_playway:setPlaceHolder("请输入玩法名称")
+        self.TextField_playway:setPlaceholderFontSize(30)
+        self.TextField_playway:setFontColor(cc.c3b(127, 90, 33))
+        self.TextField_playway:setMaxLength(8)
+        self.TextField_playway:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
+        self.TextField_playway:setInputFlag(cc.EDITBOX_INPUT_FLAG_INITIAL_CAPS_WORD)
+        self.TextField_playway:setReturnType(cc.KEYBOARD_RETURNTYPE_DONE)
+        parent:addChild(self.TextField_playway)
     end
 end
 
@@ -186,7 +209,12 @@ end
 function NewClubPlayWayInfoLayer:onAchieve()
 	local data = self.clubData
 	local playTbl = {}
-	playTbl.szParameterName = self.TextField_playway:getString()
+    playTbl.szParameterName = ''
+    if self.isOS then
+        playTbl.szParameterName = self.TextField_playway:getText()
+    else
+        playTbl.szParameterName = self.TextField_playway:getString()
+    end
 
     playTbl.cbMode = self.gameMode
     if self.gameMode ~= 0 then
@@ -279,7 +307,7 @@ function NewClubPlayWayInfoLayer:onAchieve()
         playTbl.payCount3 = 0
     end
 
-    if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+    if self.clubData.dwClubID == 359949 or self.clubData.dwClubID == 807113 or self.clubData.dwClubID == 110852 or self.clubData.dwClubID == 460861 then
         playTbl.fatigueCell = 0
         playTbl.fatigueLimit = 0
         playTbl.tableLimit = 0
@@ -348,10 +376,19 @@ function NewClubPlayWayInfoLayer:initUI(data, isModifyPlayName)
     self.Text_playwaydes:setString(desc)
 
     if not isModifyPlayName and data.szParameterName[data.idx] and data.szParameterName[data.idx] ~= "" and data.szParameterName[data.idx] ~= " " then
-    	self.TextField_playway:setString(data.szParameterName[data.idx])
+        if self.isOS then
+            self.TextField_playway:setText(data.szParameterName[data.idx])
+        else
+            self.TextField_playway:setString(data.szParameterName[data.idx])
+        end
+    	
     else
     	local text = StaticData.Games[data.wKindID].name
-    	self.TextField_playway:setString(text)
+        if self.isOS then
+            self.TextField_playway:setText(text)
+        else
+            self.TextField_playway:setString(text)
+        end
     end
 
     self.gameMode = data.cbMode[data.idx] or 0
@@ -377,7 +414,7 @@ function NewClubPlayWayInfoLayer:initUI(data, isModifyPlayName)
         self:switchTableCharge(false)
     end
 
-    if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
+    if self.clubData.dwClubID == 359949 or self.clubData.dwClubID == 807113 or self.clubData.dwClubID == 110852 or self.clubData.dwClubID == 460861 then
         self.Text_statistics:setVisible(true)
         self.Panel_fatigue:setVisible(false)
         self.Panel_anti:setVisible(true)
