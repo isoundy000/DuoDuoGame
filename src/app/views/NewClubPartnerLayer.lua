@@ -1099,7 +1099,7 @@ function NewClubPartnerLayer:RET_GET_CLUB_PARTNER(event)
             self.Button_addPartner:setVisible(true)
         else
             if CHANNEL_ID == 26 or CHANNEL_ID == 27 then
-                if data.dwPartnerLevel >= 3 then
+                if data.dwPartnerLevel >= 5 then
                     self.Button_addPartner:setVisible(false)
                 else
                     self.Button_addPartner:setVisible(true)

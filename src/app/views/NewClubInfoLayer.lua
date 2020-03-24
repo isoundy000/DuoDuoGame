@@ -828,6 +828,7 @@ end
 
 function NewClubInfoLayer:createClubTable(playwayId)
 	self.tableViewData = {}
+	self.tempTableViewCache = {}
     playwayId = playwayId or 0
     cc.UserDefault:getInstance():setIntegerForKey('CurSelPlaywayId', playwayId)
 

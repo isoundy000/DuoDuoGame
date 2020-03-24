@@ -215,7 +215,7 @@ function TableLayer:doAction(action,pBuffer)
             card:setPosition(uiPanel_tipsCardPosUser:getPosition())
         end
         GameCommon:playAnimation(self.root, "我先出",pBuffer.wCurrentUser)
-        self:showCountDown(pBuffer.wCurrentUser)
+        self:showCountDown(pBuffer.wCurrentUser,true)
         self:runAction(cc.Sequence:create(cc.DelayTime:create(1),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
 
         local uiButton_out = ccui.Helper:seekWidgetByName(self.root,"Button_out")
@@ -227,17 +227,16 @@ function TableLayer:doAction(action,pBuffer)
         local uiPanel_weaveItemArray = ccui.Helper:seekWidgetByName(self.root,string.format("Panel_weaveItemArray%d",viewID))
         uiPanel_weaveItemArray:removeAllChildren()
         local wChairID = GameCommon:getRoleChairID()
+
+        self:runAction(cc.Sequence:create(cc.DelayTime:create(0.2),cc.CallFunc:create(function(sender,event)  self:showCountDown(pBuffer.wCurrentUser,pBuffer.isShowOperate)  end)))
+
         if self.lastOutCardInfo ~= nil and pBuffer.wCurrentUser == wChairID and self.lastOutCardInfo.wOutCardUser ~= wChairID and GameCommon.tableConfig.nTableType ~= TableType_Playback then
             self.lastOutCardInfo.tableCard = self:getExtractCardType(GameCommon.player[wChairID].cbCardData,GameCommon.player[wChairID].bUserCardCount,self.lastOutCardInfo.bCardData,self.lastOutCardInfo.bUserCardCount)
         end
-        if pBuffer.wCurrentUser == wChairID and self.lastOutCardInfo.wOutCardUser ~= wChairID and #self.lastOutCardInfo.tableCard <= 0 then  
-            --self:showCountDown(pBuffer.wCurrentUser,true)
-            self:runAction(cc.Sequence:create(cc.DelayTime:create(0.6),cc.CallFunc:create(function(sender,event)  self:showCountDown(pBuffer.wCurrentUser,true) end)))
-        else
-            --self:tryAutoSendCard(pBuffer.wCurrentUser)
-            self:runAction(cc.Sequence:create(cc.DelayTime:create(0.6),cc.CallFunc:create(function(sender,event)  self:tryAutoSendCard(pBuffer.wCurrentUser) end)))
+        if pBuffer.wCurrentUser == wChairID and pBuffer.isShowOperate == true then           
+            self:runAction(cc.Sequence:create(cc.DelayTime:create(0.2),cc.CallFunc:create(function(sender,event)  self:tryAutoSendCard(pBuffer.wCurrentUser,true)  end)))
         end
-        self:runAction(cc.Sequence:create(cc.DelayTime:create(0.5),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
+        self:runAction(cc.Sequence:create(cc.DelayTime:create(0.6),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
                              
     elseif action == NetMsgId.SUB_S_WARN_INFO_PDK then
         GameCommon:playAnimation(self.root, "报警",pBuffer.wWarnUser)
@@ -328,15 +327,17 @@ function TableLayer:doAction(action,pBuffer)
         self.lastOutCardInfo.tipsIndex = 0
         self.lastOutCardInfo.tableCard = {}
         local wChairID = GameCommon:getRoleChairID()
-        if self.lastOutCardInfo ~= nil and pBuffer.wCurrentUser == wChairID and self.lastOutCardInfo.wOutCardUser ~= wChairID and GameCommon.tableConfig.nTableType ~= TableType_Playback then
-            self.lastOutCardInfo.tableCard = self:getExtractCardType(GameCommon.player[wChairID].cbCardData,GameCommon.player[wChairID].bUserCardCount,self.lastOutCardInfo.bCardData,self.lastOutCardInfo.bUserCardCount)
+
+         self:showCountDown(pBuffer.wCurrentUser,pBuffer.isShowOperate)
+        if pBuffer.wCurrentUser == wChairID and pBuffer.isShowOperate == true then 
+            if self.lastOutCardInfo ~= nil and pBuffer.wCurrentUser == wChairID and self.lastOutCardInfo.wOutCardUser ~= wChairID and GameCommon.tableConfig.nTableType ~= TableType_Playback then
+                self.lastOutCardInfo.tableCard = self:getExtractCardType(GameCommon.player[wChairID].cbCardData,GameCommon.player[wChairID].bUserCardCount,self.lastOutCardInfo.bCardData,self.lastOutCardInfo.bUserCardCount)       
+            end
+            self:tryAutoSendCard() 
         end
-        if pBuffer.wCurrentUser == wChairID and self.lastOutCardInfo.wOutCardUser ~= wChairID and #self.lastOutCardInfo.tableCard <= 0 then  
-            self:showCountDown(pBuffer.wCurrentUser,true)
-        else
-            self:tryAutoSendCard(pBuffer.wCurrentUser)
-        end
-        self:runAction(cc.Sequence:create(cc.DelayTime:create(0.1),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
+        
+
+        self:runAction(cc.Sequence:create(cc.DelayTime:create(0.2),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
         
     elseif action == NetMsgId.SUB_S_GAME_END_PDK then
         local wChairID = pBuffer.wWinUser
@@ -355,7 +356,7 @@ function TableLayer:doAction(action,pBuffer)
 	
 end
 
-function TableLayer:showCountDown(wChairID,isHide)     
+function TableLayer:showCountDown(wChairID,isShowOperate)     
     self:resetUserCountTimeAni()
     local viewID = GameCommon:getViewIDByChairID(wChairID)
     local Panel_player = ccui.Helper:seekWidgetByName(self.root,string.format("Panel_player%d",viewID))
@@ -397,7 +398,7 @@ function TableLayer:showCountDown(wChairID,isHide)
     local uiImage_outTips = ccui.Helper:seekWidgetByName(self.root,"Image_outTips")
     uiImage_outTips:setVisible(false)
     if wChairID == GameCommon:getRoleChairID() then
-        if isHide ~= true and GameCommon.tableConfig.nTableType ~= TableType_Playback then
+        if isShowOperate == true and GameCommon.tableConfig.nTableType ~= TableType_Playback then
             uiPanel_out:setVisible(true)
             if GameCommon.gameConfig.bAbandon == 0 then
                 local wPlayerCount = GameCommon.gameConfig.bPlayerCount
@@ -465,8 +466,8 @@ function TableLayer:showHandCard(wChairID,effectsType,isShowEndCard)
     local uiPanel_card = ccui.Helper:seekWidgetByName(self.root,"Panel_card")
     uiPanel_handCard = ccui.Helper:seekWidgetByName(uiPanel_card,string.format("Panel_handCard%d",viewID))
     if isShowEndCard == true then
-        local uiPanel_weaveItemArray = ccui.Helper:seekWidgetByName(self.root,"Panel_weaveItemArray")
-        uiPanel_weaveItemArray:setVisible(false)
+        -- local uiPanel_weaveItemArray = ccui.Helper:seekWidgetByName(self.root,"Panel_weaveItemArray")
+        -- uiPanel_weaveItemArray:setVisible(false)
 --        for i = 2, 3 do
 --            local uiPanel_player = ccui.Helper:seekWidgetByName(self.root,string.format("Panel_player%d",i))
 --            uiPanel_player:setPositionY(cc.Director:getInstance():getVisibleSize().height*0.79)
@@ -1458,19 +1459,14 @@ end
 
 function TableLayer:tryAutoSendCard(wCurrentUser)
     local wChairID = GameCommon:getRoleChairID()
-    if wCurrentUser ~= wChairID then
-        self:showCountDown(wCurrentUser)
-        return
-    end
     --如果上次出牌是其他人 
     if self.lastOutCardInfo.wOutCardUser ~= wChairID then
-        if #self.lastOutCardInfo.tableCard == 1 and #self.lastOutCardInfo.tableCard[1] == GameCommon.player[wChairID].bUserCardCount then
+        if self.lastOutCardInfo.tableCard ~= nil and #self.lastOutCardInfo.tableCard == 1 and #self.lastOutCardInfo.tableCard[1] == GameCommon.player[wChairID].bUserCardCount then
             local tabelCard = {}
             for i = 1, GameCommon.player[wChairID].bUserCardCount do
                 table.insert(tabelCard,#tabelCard+1,GameCommon.player[wChairID].cbCardData[i])
             end
             self:sendCard(wChairID,tabelCard)
-            self:showCountDown(wCurrentUser,true)
             return
         end
     else
@@ -1480,7 +1476,6 @@ function TableLayer:tryAutoSendCard(wCurrentUser)
             if targetType ~= GameCommon.CardType_bomb then 
                 local tableSortCard = self:getSortCard(GameCommon.player[wChairID].cbCardData,GameCommon.player[wChairID].bUserCardCount)
                 if #tableSortCard[4] > 0 then
-                    self:showCountDown(wCurrentUser)
                     return
                 end
             end
@@ -1489,11 +1484,9 @@ function TableLayer:tryAutoSendCard(wCurrentUser)
                 table.insert(tabelCard,#tabelCard+1,GameCommon.player[wChairID].cbCardData[i])
             end
             self:sendCard(wChairID,tabelCard)
-            self:showCountDown(wCurrentUser)--,true
             return
         end
     end
-    self:showCountDown(wCurrentUser)
 end
 
 function TableLayer:sendCard(wChairID,tableCardData)

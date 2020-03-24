@@ -1,6 +1,9 @@
 cc.exports.SERVER_INFO = {
     ip = "login.qilaigame.com",
     port = 8686,
+
+    ip = "192.168.1.88",
+    port = 8585
 }
 cc.exports.LAYER_SCENE = 0
 cc.exports.LAYER_OPERATION = 0x100

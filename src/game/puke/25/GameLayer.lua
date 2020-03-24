@@ -437,7 +437,7 @@ function GameLayer:readBuffer(luaFunc, mainCmdID, subCmdID)
             _tagMsg.pBuffer.bNewTurn = luaFunc:readRecvBool()
             _tagMsg.pBuffer.wPassUser = luaFunc:readRecvWORD()
             _tagMsg.pBuffer.wCurrentUser = luaFunc:readRecvWORD()
-
+            _tagMsg.pBuffer.isShowOperate = luaFunc:readRecvBool() --是否显示操作
         elseif subCmdID == NetMsgId.SUB_S_BOMB_PDK then   
             _tagMsg.pBuffer.wCurrentUser = luaFunc:readRecvWORD()   
             _tagMsg.pBuffer.lBombScore = {}
@@ -457,7 +457,7 @@ function GameLayer:readBuffer(luaFunc, mainCmdID, subCmdID)
             for i = 1 , GameCommon.MAX_COUNT do
                 _tagMsg.pBuffer.bCardData[i] = luaFunc:readRecvByte()
             end
-            
+            _tagMsg.pBuffer.isShowOperate = luaFunc:readRecvBool() --是否显示操作
 
         elseif subCmdID == NetMsgId.SUB_S_GAME_END_PDK then
             _tagMsg.pBuffer.wWinUser = luaFunc:readRecvWORD()
@@ -513,6 +513,8 @@ function GameLayer:readBuffer(luaFunc, mainCmdID, subCmdID)
             for i=1,GameCommon.MAX_COUNT do
                 _tagMsg.pBuffer.bCardData[i] = luaFunc:readRecvByte()
             end
+            _tagMsg.pBuffer.wCurrentUser = luaFunc:readRecvWORD()
+            _tagMsg.pBuffer.isShowOperate = luaFunc:readRecvBool() --是否显示操作    
             
         elseif subCmdID == NetMsgId.SUB_S_SITFAILED then
             _tagMsg.pBuffer.wErrorCode = luaFunc:readRecvWORD()
@@ -577,13 +579,14 @@ function GameLayer:readBuffer(luaFunc, mainCmdID, subCmdID)
             end
             _tagMsg.pBuffer.lOutCardleftTime = luaFunc:readRecvLong()
 
-            if GameCommon.isFriendsGame then
+            --if GameCommon.isFriendsGame then
                 _tagMsg.pBuffer.lUserScore = {}
                 for i=1,3 do
                     _tagMsg.pBuffer.lUserScore[i] = luaFunc:readRecvLong()
                 end
-            end
-			
+            --end
+            _tagMsg.pBuffer.isShowOperate = luaFunc:readRecvBool() --是否显示操作	
+            local  a  = 1
         else
             print("not found this subCmdID : %d",subCmdID)
             return false
@@ -676,9 +679,9 @@ function GameLayer:OnGameMessageRun(_tagMsg)
         elseif subCmdID == NetMsgId.REC_SUB_S_SHOW_CARD_PDK then
             local wChairID = pBuffer.wChairID
             if GameCommon.gameConfig.bDel345 == 1 then
-                GameCommon.player[i].bUserCardCount = 11
+                GameCommon.player[wChairID].bUserCardCount = 11
             else
-                GameCommon.player[i].bUserCardCount = GameCommon.MAX_COUNT
+                GameCommon.player[wChairID].bUserCardCount = GameCommon.MAX_COUNT
             end
             self.tableLayer:setHandCard(wChairID,GameCommon.player[wChairID].bUserCardCount, pBuffer.cbCardData)
             self.tableLayer:showHandCard(wChairID,1)     
@@ -729,6 +732,8 @@ function GameLayer:OnGameMessageRun(_tagMsg)
             uiPanel_end:runAction(cc.Sequence:create(
                 cc.DelayTime:create(1),
                 cc.CallFunc:create(function(sender,event) 
+                    local uiPanel_weaveItemArray = ccui.Helper:seekWidgetByName(self.root,"Panel_weaveItemArray")
+                    uiPanel_weaveItemArray:setVisible(false)
                     if GameCommon.tableConfig.nTableType == TableType_SportsRoom then
                         pBuffer.wKindID =GameCommon.tableConfig.wKindID
                         uiPanel_end:addChild(require("common.SportsGameEndLayer"):create(pBuffer))  
@@ -763,9 +768,11 @@ function GameLayer:OnGameMessageRun(_tagMsg)
                     wCurrentUser = wChairID,
                     wOutCardUser = pBuffer.bTurnUser,
                     notDeleteCard = true,
+                    isShowOperate = pBuffer.isShowOperate,
                 }
                 self.tableLayer:doAction(NetMsgId.SUB_S_OUT_CARD_PDK,data)
             else 
+                self.tableLayer:showCountDown(pBuffer.wCurrentUser,pBuffer.isShowOperate) 
                 self:runAction(cc.Sequence:create(cc.DelayTime:create(0),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
             end   
         else 
@@ -799,10 +806,11 @@ function GameLayer:OnGameMessageRun(_tagMsg)
                     wCurrentUser = pBuffer.wCurrentUser,
                     wOutCardUser = pBuffer.wLastOutUser,
                     notDeleteCard = true,
+                    isShowOperate = pBuffer.isShowOperate,
                 }
                 self.tableLayer:doAction(NetMsgId.SUB_S_OUT_CARD_PDK,data)
             else
-                self.tableLayer:showCountDown(pBuffer.wCurrentUser)        
+                self.tableLayer:showCountDown(pBuffer.wCurrentUser,pBuffer.isShowOperate)        
                 self:runAction(cc.Sequence:create(cc.DelayTime:create(0),cc.CallFunc:create(function(sender,event) EventMgr:dispatch(EventType.EVENT_TYPE_CACEL_MESSAGE_BLOCK) end)))
             end
              

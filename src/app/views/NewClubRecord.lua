@@ -751,7 +751,7 @@ end
 --==============================--
 function NewClubRecord:RET_CL_MAIN_RECORD_BY_TYPE2(event)
 	local data = event._usedata
-	local lDay = self:getLoaclByServerTime(data.dwPlayTimeStart)
+	local lDay = self:getLoaclByServerTime(data.dwPlayTimeStart+data.dwPlayTimeCount)
 	self:insertCacheRecordData(lDay,RECORD_TYPE.PERSON_RECORD,data)
 end
 
@@ -761,7 +761,7 @@ end
 --==============================--
 function NewClubRecord:RET_CL_MAIN_RECORD_BY_TYPE3(event)
 	local data = event._usedata
-	local lDay = self:getLoaclByServerTime(data.dwPlayTimeStart)
+	local lDay = self:getLoaclByServerTime(data.dwPlayTimeStart+data.dwPlayTimeCount)
 	self:insertCacheRecordData(lDay,RECORD_TYPE.CLUB_RECORD,data)
 end
 
